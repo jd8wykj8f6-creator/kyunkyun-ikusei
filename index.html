@@ -17,6 +17,62 @@ button:active{transform:scale(.95)}
 .bar{height:14px;background:#f2d4e9;border-radius:10px;overflow:hidden}
 #fill{height:100%;width:0;background:#ff69aa;transition:.2s}
 .small{font-size:13px}
+
+.gacha-effect {
+  display: none;
+  text-align: center;
+  padding: 16px;
+  margin: 12px auto;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #ffe0f2, #dff5ff, #fff4c7);
+  color: #a23c91;
+  font-size: 20px;
+  font-weight: bold;
+  animation: sparkle 0.8s ease-in-out;
+}
+
+.gacha-effect.show {
+  display: block;
+}
+
+@keyframes sparkle {
+  0% {
+    transform: scale(0.7);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+.gacha-history {
+  margin: 16px auto;
+  padding: 14px;
+  border-radius: 16px;
+  background: #fff0f7;
+  border: 2px solid #ffc5e1;
+  text-align: left;
+}
+
+.gacha-history h3 {
+  margin-top: 0;
+  color: #d14d91;
+  text-align: center;
+}
+
+#gachaHistoryList {
+  padding-left: 24px;
+  margin-bottom: 0;
+}
+
+#gachaHistoryList li {
+  padding: 6px 0;
+  color: #75405e;
+}
 </style>
 </head>
 <body>
@@ -39,9 +95,15 @@ button:active{transform:scale(.95)}
 <button onclick="tapLove()">💗 なでなで</button>
 <button onclick="gift()">🎁 プレゼント</button>
 <button onclick="changeOutfit()">👗 お着替え</button>
-<button onclick="changeOutfit()">👗 お着替え</button>
 <button onclick="gacha()">🎁 衣装ガチャ（20コイン）</button>
-<p class="small" id="giftmsg">なでなでして好感度を上げよう！</p>
+<div id="gachaEffect" class="gacha-effect"></div>
+  <div class="gacha-history">
+  <h3>📜 ガチャ履歴</h3>
+  <ul id="gachaHistoryList">
+    <li>まだ衣装を引いていないよ♡</li>
+  </ul>
+</div>
+  <p class="small" id="giftmsg">なでなでして好感度を上げよう！</p>
 <hr>
 <p>💰 コイン：<b id="coins">0</b></p>
 <button onclick="buyUpgrade()">✨ 好感度アップ強化（20コイン）</button>
@@ -125,6 +187,11 @@ function changeOutfit(){
   saveGame();
 }
 function gacha(){
+    const effect = document.getElementById("gachaEffect");
+  effect.classList.remove("show");
+  effect.textContent = "✨🎁 キラキラ…！ 🎁✨";
+  void effect.offsetWidth;
+  effect.classList.add("show");
   if(coins<20){
     document.getElementById("giftmsg").textContent="コインが20枚必要だよ♡";
     return;
@@ -133,7 +200,10 @@ function gacha(){
   coins-=20;
 
   const prize=Math.random()<0.5?2:1;
-
+  effect.textContent = prize === 1
+    ? "✨🖤 黒ゴシックドレス！ 🖤✨"
+    : "✨🩵 水色の天使衣装！ 🩵✨";
+  
   if(!ownedOutfits.includes(prize)){
     ownedOutfits.push(prize);
     gachaHistory.push(prize);
@@ -146,10 +216,31 @@ function gacha(){
       "衣装がかぶっちゃった！10コイン返還♡";
   }
 
-  update();
+    update();
+  renderGachaHistory();
   saveGame();
 }
 
+function renderGachaHistory(){
+  const list = document.getElementById("gachaHistoryList");
+  list.innerHTML = "";
+
+  if(gachaHistory.length === 0){
+    const item = document.createElement("li");
+    item.textContent = "まだ衣装を引いていないよ♡";
+    list.appendChild(item);
+    return;
+  }
+
+  gachaHistory.slice().reverse().forEach((prize, index) => {
+    const item = document.createElement("li");
+    const name = prize === 1
+      ? "🖤 黒ゴシックドレス"
+      : "🩵 水色の天使衣装";
+    item.textContent = name;
+    list.appendChild(item);
+  });
+}
 function buyUpgrade(){
   if(coins>=20){
     coins-=20;
@@ -171,6 +262,7 @@ const savedOutfit=outfitImages[outfit]||outfitImages[0];
 document.getElementById("girl").innerHTML=
   `<img src="${savedOutfit[0]}" alt="${savedOutfit[1]}" style="width:100%;max-width:260px;height:300px;object-fit:contain;">`;
 update();
+  renderGachaHistory();
 </script>
 </body>
 </html>
