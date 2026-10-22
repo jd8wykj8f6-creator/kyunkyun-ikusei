@@ -83,6 +83,7 @@ function gift(){if(coins>=5){love+=5;coins-=5;update();document.getElementById("
 function changeOutfit(){outfit=(outfit+1)%2;if(outfit===1){document.getElementById("girl").innerHTML='<img src="./FE8A9EB6-3670-401F-8B25-55872A7FD3B9.png" alt="黒ゴシックドレス" style="width:100%;max-width:260px;height:300px;object-fit:contain;">';}else{document.getElementById("girl").innerHTML='<img src="./IMG_4703.png" alt="ももちゃん" style="width:100%;max-width:260px;height:300px;object-fit:contain;">';}document.getElementById("giftmsg").textContent=outfit===1?"黒ゴシックドレスにお着替えしたよ♡":"いつもの服に戻ったよ♡";saveGame();}
 function buyUpgrade(){if(coins>=20){coins-=20;power++;update();document.getElementById("giftmsg").textContent="強化成功！なでなで効果＋1♡";}else{document.getElementById("giftmsg").textContent="コインが足りないよ！なでなでして集めよう♡";}}
 loadGame();
+document.getElementById("girl").innerHTML=outfit===1?'<img src="./FE8A9EB6-3670-401F-8B25-55872A7FD3B9.png" alt="黒ゴシックドレス" style="width:100%;max-width:260px;height:300px;object-fit:contain;">':'<img src="./IMG_4703.png" alt="ももちゃん" style="width:100%;max-width:260px;height:300px;object-fit:contain;">';
 update();
 </script>
 </body>
