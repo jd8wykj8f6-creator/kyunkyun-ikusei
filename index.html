@@ -186,6 +186,7 @@ function changeOutfit(){
   document.getElementById("giftmsg").textContent=item[1]+"にお着替えしたよ♡";
   saveGame();
 }
+
 function gacha(){
   if(coins<20){
     document.getElementById("giftmsg").textContent="コインが20枚必要だよ♡";
@@ -197,9 +198,7 @@ function gacha(){
   effect.textContent = "✨🎁 キラキラ…！ 🎁✨";
   void effect.offsetWidth;
   effect.classList.add("show");
-    document.getElementById("giftmsg").textContent="コインが20枚必要だよ♡";
-    return;
-  }
+
 
   coins-=20;
 
