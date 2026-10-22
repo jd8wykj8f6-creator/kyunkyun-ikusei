@@ -37,6 +37,8 @@ button:active{transform:scale(.95)}
 <button onclick="tapLove()">💗 なでなで</button>
 <button onclick="gift()">🎁 プレゼント</button>
 <button onclick="changeOutfit()">👗 お着替え</button>
+<button onclick="changeOutfit()">👗 お着替え</button>
+<button onclick="gacha()">🎁 衣装ガチャ（20コイン）</button>
 <p class="small" id="giftmsg">なでなでして好感度を上げよう！</p>
 <hr>
 <p>💰 コイン：<b id="coins">0</b></p>
@@ -86,6 +88,33 @@ document.getElementById("message").textContent=messages[Math.min(3,Math.floor((l
 function tapLove(){love+=power;coins+=1;update();document.getElementById("giftmsg").textContent="きゅんっ♡ 好感度が上がったよ！";saveGame();}
 function gift(){if(coins>=5){love+=5;coins-=5;update();document.getElementById("giftmsg").textContent="プレゼントを渡したよ！♡";saveGame();}else{document.getElementById("giftmsg").textContent="コインが足りないよ！なでなでして集めよう♡";}}
 function changeOutfit(){outfit=(outfit+1)%2;if(outfit===1){document.getElementById("girl").innerHTML='<img src="./FE8A9EB6-3670-401F-8B25-55872A7FD3B9.png" alt="黒ゴシックドレス" style="width:100%;max-width:260px;height:300px;object-fit:contain;">';}else{document.getElementById("girl").innerHTML='<img src="./IMG_4703.png" alt="ももちゃん" style="width:100%;max-width:260px;height:300px;object-fit:contain;">';}document.getElementById("giftmsg").textContent=outfit===1?"黒ゴシックドレスにお着替えしたよ♡":"いつもの服に戻ったよ♡";saveGame();}
+
+function gacha(){
+  if(coins<20){
+    document.getElementById("giftmsg").textContent="コインが20枚必要だよ♡";
+    return;
+  }
+
+  coins-=20;
+
+  const prize=Math.random()<0.5?1:2;
+
+  if(!ownedOutfits.includes(prize)){
+    ownedOutfits.push(prize);
+    gachaHistory.push(prize);
+    document.getElementById("giftmsg").textContent=
+      prize===1?"黒ゴシックドレスをゲット♡":"限定衣装をゲット♡";
+  }else{
+    coins+=10;
+    gachaHistory.push(prize);
+    document.getElementById("giftmsg").textContent=
+      "衣装がかぶっちゃった！10コイン返還♡";
+  }
+
+  update();
+  saveGame();
+}
+
 function buyUpgrade(){if(coins>=20){coins-=20;power++;update();document.getElementById("giftmsg").textContent="強化成功！なでなで効果＋1♡";}else{document.getElementById("giftmsg").textContent="コインが足りないよ！なでなでして集めよう♡";}}
 loadGame();
 document.getElementById("girl").innerHTML=outfit===1?'<img src="./FE8A9EB6-3670-401F-8B25-55872A7FD3B9.png" alt="黒ゴシックドレス" style="width:100%;max-width:260px;height:300px;object-fit:contain;">':'<img src="./IMG_4703.png" alt="ももちゃん" style="width:100%;max-width:260px;height:300px;object-fit:contain;">';
