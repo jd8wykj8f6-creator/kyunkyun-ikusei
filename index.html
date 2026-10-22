@@ -45,13 +45,16 @@ button:active{transform:scale(.95)}
 </div>
 <script>
 let love=0,coins=0,level=1,power=1,outfit=0;
+let ownedOutfits=[0,1],gachaHistory=[];
 function saveGame(){
   localStorage.setItem("kyunkyunSave",JSON.stringify({
     love:love,
     coins:coins,
     level:level,
     power:power,
-    outfit:outfit
+    outfit:outfit,
+ownedOutfits:ownedOutfits,
+gachaHistory:gachaHistory
   }));
 }
 
@@ -64,6 +67,8 @@ function loadGame(){
     level=saved.level ?? 1;
     power=saved.power ?? 1;
     outfit=saved.outfit ?? 0;
+  ownedOutfits=saved.ownedOutfits ?? [0,1];
+gachaHistory=saved.gachaHistory ?? [];
   }
 }
 const girls=["👧🏻","👩🏻","👸🏻","👑👸🏻"];
