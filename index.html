@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>きゅんきゅん♡育成ルーム</title>
+<style>
+body{margin:0;background:linear-gradient(#ffe3f1,#e9e4ff);font-family:sans-serif;text-align:center;color:#713d68;padding:20px}
+.room{max-width:420px;margin:auto;background:#ffffffd9;border-radius:25px;padding:20px;box-shadow:0 5px 20px #d9a9d0}
+h1{font-size:24px}
+.girl{font-size:100px;margin:15px}
+button{border:0;border-radius:18px;padding:13px 18px;margin:6px;background:#ff7eb6;color:white;font-size:16px;font-weight:bold}
+button:active{transform:scale(.95)}
+.status{background:#fff0f8;border-radius:15px;padding:12px;margin:12px 0}
+.bar{height:14px;background:#f2d4e9;border-radius:10px;overflow:hidden}
+#fill{height:100%;width:0;background:#ff69aa;transition:.2s}
+.small{font-size:13px}
+</style>
+</head>
+<body>
+<div class="room">
+<h1>🎀 きゅんきゅん♡育成ルーム 🎀</h1>
+<p>あなたとの毎日で、女の子が成長するよ！</p>
+<div class="girl" id="girl">👧🏻</div>
+<h2 id="name">ももちゃん</h2>
+<div class="status">
+<div>💗 好感度：<b id="love">0</b></div>
+<div class="bar"><div id="fill"></div></div>
+<p>🌸 レベル：<b id="level">1</b></p>
+<p id="message">「ねえねえ、もっと一緒にいて？」</p>
+</div>
+<button onclick="tapLove()">💗 なでなで</button>
+<button onclick="gift()">🎁 プレゼント</button>
+<button onclick="changeOutfit()">👗 お着替え</button>
+<p class="small" id="giftmsg">なでなでして好感度を上げよう！</p>
+<hr>
+<p>💰 コイン：<b id="coins">0</b></p>
+<button onclick="buyUpgrade()">✨ 好感度アップ強化（20コイン）</button>
+<p class="small">好感度が増えるとレベルアップ！</p>
+</div>
+<script>
+let love=0,coins=0,level=1,power=1,outfit=0;
+const girls=["👧🏻","👩🏻","👸🏻","👑👸🏻"];
+const outfits=["👗","👘","👚","✨👗"];
+const messages=["「ねえねえ、もっと一緒にいて？」","「えへへ、うれしいな♡」","「あなたが一番大好き！」","「これからもずっと一緒だよ♡」"];
+function update(){
+level=Math.floor(love/10)+1;
+document.getElementById("love").textContent=love;
+document.getElementById("coins").textContent=coins;
+document.getElementById("level").textContent=level;
+document.getElementById("fill").style.width=(love%10)*10+"%";
+document.getElementById("girl").textContent=girls[Math.min(3,Math.floor((level-1)/3))];
+document.getElementById("message").textContent=messages[Math.min(3,Math.floor((level-1)/3))];
+}
+function tapLove(){love+=power;coins+=1;update();document.getElementById("giftmsg").textContent="きゅんっ♡ 好感度が上がったよ！";}
+function gift(){love+=5;coins=Math.max(0,coins-5);update();document.getElementById("giftmsg").textContent="プレゼントを渡したよ！";}
+function changeOutfit(){outfit=(outfit+1)%outfits.length;document.getElementById("girl").textContent=outfits[outfit];document.getElementById("giftmsg").textContent="お着替えしたよ♡";}
+function buyUpgrade(){if(coins>=20){coins-=20;power++;update();document.getElementById("giftmsg").textContent="強化成功！なでなで効果＋1♡";}else{document.getElementById("giftmsg").textContent="コインが足りないよ！なでなでして集めよう♡";}}
+update();
+</script>
+</body>
+</html>
