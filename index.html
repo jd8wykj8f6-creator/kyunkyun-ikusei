@@ -28,6 +28,8 @@ button:active{transform:scale(.95)}
        style="width:100%;max-width:260px;height:300px;object-fit:contain;">
 </div>
 <h2 id="name">ももちゃん</h2>
+<input id="nameInput" type="text" placeholder="好きな名前を入力">
+<button onclick="changeName()">名前を変更</button>
 <div class="status">
 <div>💗 好感度：<b id="love">0</b></div>
 <div class="bar"><div id="fill"></div></div>
@@ -46,12 +48,13 @@ button:active{transform:scale(.95)}
 <p class="small">好感度が増えるとレベルアップ！</p>
 </div>
 <script>
-let love=0,coins=0,level=1,power=1,outfit=0;
-let ownedOutfits=[0,1],gachaHistory=[];
+let love=0,coilet ownedOutfits=[0,1],gachaHistory=[];
+let ownedOutfits=[0],gachaHistory=[];
 function saveGame(){
   localStorage.setItem("kyunkyunSave",JSON.stringify({
     love:love,
-    coins:coins,
+ ns=0,level=1,power=1,outfit=0;
+   coins:coins,
     level:level,
     power:power,
     outfit:outfit,
@@ -87,8 +90,41 @@ document.getElementById("message").textContent=messages[Math.min(3,Math.floor((l
 }
 function tapLove(){love+=power;coins+=1;update();document.getElementById("giftmsg").textContent="きゅんっ♡ 好感度が上がったよ！";saveGame();}
 function gift(){if(coins>=5){love+=5;coins-=5;update();document.getElementById("giftmsg").textContent="プレゼントを渡したよ！♡";saveGame();}else{document.getElementById("giftmsg").textContent="コインが足りないよ！なでなでして集めよう♡";}}
-function changeOutfit(){outfit=(outfit+1)%2;if(outfit===1){document.getElementById("girl").innerHTML='<img src="./FE8A9EB6-3670-401F-8B25-55872A7FD3B9.png" alt="黒ゴシックドレス" style="width:100%;max-width:260px;height:300px;object-fit:contain;">';}else{document.getElementById("girl").innerHTML='<img src="./IMG_4703.png" alt="ももちゃん" style="width:100%;max-width:260px;height:300px;object-fit:contain;">';}document.getElementById("giftmsg").textContent=outfit===1?"黒ゴシックドレスにお着替えしたよ♡":"いつもの服に戻ったよ♡";saveGame();}
+let characterName=localStorage.getItem("kyunkyunName")||"ももちゃん";
 
+function changeName(){
+  const input=document.getElementById("nameInput");
+  const newName=input.value.trim();
+
+  if(!newName){
+    document.getElementById("giftmsg").textContent="名前を入力してね♡";
+    return;
+  }
+
+  characterName=newName;
+  document.getElementById("name").textContent=characterName;
+  localStorage.setItem("kyunkyunName",characterName);
+  document.getElementById("giftmsg").textContent="これからは"+characterName+"って呼ぶね♡";
+  input.value="";
+}
+function changeOutfit(){
+  if(!ownedOutfits.includes(0)) ownedOutfits.push(0);
+  const available=[0,...ownedOutfits.filter(x=>x!==0)];
+  const current=available.indexOf(outfit);
+  outfit=available[(current+1)%available.length];
+
+  const images={
+    0:['./IMG_4703.png','ももちゃん'],
+    1:['./FE8A9EB6-3670-401F-8B25-55872A7FD3B9.png','黒ゴシックドレス'],
+    2:['./EE85B7A1-94BB-4D24-9E85-62DE2F751731.png','水色の天使衣装']
+  };
+
+  const item=images[outfit]||images[0];
+  document.getElementById("girl").innerHTML=
+    `<img src="${item[0]}" alt="${item[1]}" style="width:100%;max-width:260px;height:300px;object-fit:contain;">`;
+  document.getElementById("giftmsg").textContent=item[1]+"にお着替えしたよ♡";
+  saveGame();
+}
 function gacha(){
   if(coins<20){
     document.getElementById("giftmsg").textContent="コインが20枚必要だよ♡";
@@ -97,7 +133,7 @@ function gacha(){
 
   coins-=20;
 
-  const prize=Math.random()<0.5?1:2;
+  const prize=Math.random()<0.5?2:1;
 
   if(!ownedOutfits.includes(prize)){
     ownedOutfits.push(prize);
@@ -117,7 +153,15 @@ function gacha(){
 
 function buyUpgrade(){if(coins>=20){coins-=20;power++;update();document.getElementById("giftmsg").textContent="強化成功！なでなで効果＋1♡";}else{document.getElementById("giftmsg").textContent="コインが足りないよ！なでなでして集めよう♡";}}
 loadGame();
-document.getElementById("girl").innerHTML=outfit===1?'<img src="./FE8A9EB6-3670-401F-8B25-55872A7FD3B9.png" alt="黒ゴシックドレス" style="width:100%;max-width:260px;height:300px;object-fit:contain;">':'<img src="./IMG_4703.png" alt="ももちゃん" style="width:100%;max-width:260px;height:300px;object-fit:contain;">';
+  document.getElementById("name").textContent=characterName;
+const outfitImages={
+  0:['./IMG_4703.png','ももちゃん'],
+  1:['./FE8A9EB6-3670-401F-8B25-55872A7FD3B9.png','黒ゴシックドレス'],
+  2:['./EE85B7A1-94BB-4D24-9E85-62DE2F751731.png','水色の天使衣装']
+};
+const savedOutfit=outfitImages[outfit]||outfitImages[0];
+document.getElementById("girl").innerHTML=
+  `<img src="${savedOutfit[0]}" alt="${savedOutfit[1]}" style="width:100%;max-width:260px;height:300px;object-fit:contain;">`;
 update();
 </script>
 </body>
