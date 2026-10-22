@@ -187,12 +187,16 @@ function changeOutfit(){
   saveGame();
 }
 function gacha(){
-    const effect = document.getElementById("gachaEffect");
+  if(coins<20){
+    document.getElementById("giftmsg").textContent="コインが20枚必要だよ♡";
+    return;
+  }
+
+  const effect = document.getElementById("gachaEffect");
   effect.classList.remove("show");
   effect.textContent = "✨🎁 キラキラ…！ 🎁✨";
   void effect.offsetWidth;
   effect.classList.add("show");
-  if(coins<20){
     document.getElementById("giftmsg").textContent="コインが20枚必要だよ♡";
     return;
   }
