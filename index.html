@@ -48,12 +48,11 @@ button:active{transform:scale(.95)}
 <p class="small">好感度が増えるとレベルアップ！</p>
 </div>
 <script>
-let love=0,coilet ownedOutfits=[0,1],gachaHistory=[];
+let love=0,coins=0,level=1,power=1,outfit=0;
 let ownedOutfits=[0],gachaHistory=[];
 function saveGame(){
   localStorage.setItem("kyunkyunSave",JSON.stringify({
     love:love,
- ns=0,level=1,power=1,outfit=0;
    coins:coins,
     level:level,
     power:power,
@@ -151,8 +150,17 @@ function gacha(){
   saveGame();
 }
 
-function buyUpgrade(){if(coins>=20){coins-=20;power++;update();document.getElementById("giftmsg").textContent="強化成功！なでなで効果＋1♡";}else{document.getElementById("giftmsg").textContent="コインが足りないよ！なでなでして集めよう♡";}}
-loadGame();
+function buyUpgrade(){
+  if(coins>=20){
+    coins-=20;
+    power++;
+    update();
+    document.getElementById("giftmsg").textContent="強化成功！なでなで効果＋1♡";
+    saveGame();
+  }else{
+    document.getElementById("giftmsg").textContent="コインが足りないよ！なでなでして集めよう♡";
+  }
+}loadGame();
   document.getElementById("name").textContent=characterName;
 const outfitImages={
   0:['./IMG_4703.png','ももちゃん'],
