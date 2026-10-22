@@ -52,12 +52,12 @@ document.getElementById("love").textContent=love;
 document.getElementById("coins").textContent=coins;
 document.getElementById("level").textContent=level;
 document.getElementById("fill").style.width=(love%10)*10+"%";
-document.getElementById("girl").textContent=girls[Math.min(3,Math.floor((level-1)/3))];
+// 女の子の画像を表示するため、絵文字で上書きしない
 document.getElementById("message").textContent=messages[Math.min(3,Math.floor((level-1)/3))];
 }
 function tapLove(){love+=power;coins+=1;update();document.getElementById("giftmsg").textContent="きゅんっ♡ 好感度が上がったよ！";}
 function gift(){love+=5;coins=Math.max(0,coins-5);update();document.getElementById("giftmsg").textContent="プレゼントを渡したよ！";}
-function changeOutfit(){outfit=(outfit+1)%outfits.length;document.getElementById("girl").textContent=outfits[outfit];document.getElementById("giftmsg").textContent="お着替えしたよ♡";}
+function changeOutfit(){outfit=(outfit+1)%outfits.length;// 画像表示を維持するdocument.getElementById("giftmsg").textContent="お着替えしたよ♡";}
 function buyUpgrade(){if(coins>=20){coins-=20;power++;update();document.getElementById("giftmsg").textContent="強化成功！なでなで効果＋1♡";}else{document.getElementById("giftmsg").textContent="コインが足りないよ！なでなでして集めよう♡";}}
 update();
 </script>
