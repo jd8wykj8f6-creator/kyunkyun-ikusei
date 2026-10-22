@@ -8,28 +8,28 @@
 <style>
 *{box-sizing:border-box}
 body{margin:0;padding:14px;background:radial-gradient(circle at top,#fff9df,#ffe0f0 40%,#dcd0ff 85%);font-family:sans-serif;text-align:center;color:#713d68;transition:.3s}
-.room{max-width:460px;margin:auto;padding:18px;border:3px solid #e6c778;border-radius:28px;box-shadow:0 0 0 5px #fff4cf,0 8px 30px #c69bdc;background:linear-gradient(145deg,#fffdfd,#fff0f8 55%,#f8eaff);overflow:hidden}
-h1{font-size:23px}
-h2{margin:10px}
-.girl{margin:12px auto;padding:10px;border-radius:25px;background:radial-gradient(ellipse,#fff9fd,#f8dff0);box-shadow:0 0 22px #eac5ff}
-.girl img{width:100%;max-width:260px;height:300px;object-fit:contain}
-button,input,select{font-size:15px;border-radius:16px;padding:11px;margin:5px;max-width:100%}
+.room{max-width:460px;margin:auto;padding:16px;border:3px solid #e6c778;border-radius:28px;box-shadow:0 0 0 5px #fff4cf,0 8px 30px #c69bdc;background:linear-gradient(145deg,#fffdfd,#fff0f8 55%,#f8eaff);overflow:hidden}
+h1{font-size:23px}h2{margin:10px}
+.girl{margin:12px auto;padding:10px;border-radius:25px;background:radial-gradient(ellipse,#fff9fd,#f8dff0);box-shadow:0 0 22px #eac5ff;cursor:pointer}
+.girl img{width:100%;max-width:260px;height:300px;object-fit:contain;pointer-events:none}
+button,input{font-size:14px;border-radius:14px;padding:10px;margin:4px;max-width:100%}
 button{border:1px solid #f0d18b;background:linear-gradient(135deg,#ff9acb,#e9a9ed,#d9b4ff);color:white;font-weight:bold;box-shadow:0 3px 0 #d9a0c7;cursor:pointer}
 button:active{transform:scale(.96)}
-input,select{border:1px solid #e8bddd;background:#fff}
+button:disabled{opacity:.45}
+input{border:1px solid #e8bddd;background:white}
 .status,.panel{background:#fff8fc;border:1px solid #e8c5ed;border-radius:18px;padding:12px;margin:12px 0}
 .bar{height:14px;background:#f2d4e9;border-radius:10px;overflow:hidden}
-#fill{height:100%;width:0;background:#ff69aa;transition:.2s}
-.small{font-size:13px}
-.gacha-effect{display:none;padding:15px;margin:12px auto;border-radius:16px;background:linear-gradient(135deg,#ffe0f2,#dff5ff,#fff4c7);font-size:20px;font-weight:bold}
-.gacha-effect.show{display:block;animation:sparkle .8s ease-in-out}
-@keyframes sparkle{0%{transform:scale(.7);opacity:0}60%{transform:scale(1.08);opacity:1}100%{transform:scale(1);opacity:1}}
+#fill{height:100%;background:#ff69aa;transition:.2s}
+.small{font-size:12px}
 .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-.card{padding:8px;border:1px solid #efc9e8;border-radius:15px;background:#fff}
-.card img{width:100%;height:145px;object-fit:contain}
+.card{padding:8px;border:1px solid #efc9e8;border-radius:15px;background:#fff;overflow-wrap:anywhere}
+.card img{width:100%;height:130px;object-fit:contain}
 .card p{font-size:13px;margin:5px}
-#dialogue{min-height:48px;padding:10px;border-radius:14px;background:#fff0f7}
-.history{text-align:left;padding-left:25px}
+.dialogue{min-height:45px;padding:10px;border-radius:14px;background:#fff0f7}
+.history{text-align:left;padding-left:24px}
+.story{padding:12px;background:#fff0f7;border-radius:14px;margin:8px 0}
+.gacha-effect{display:none;padding:12px;margin:10px auto;border-radius:16px;background:linear-gradient(135deg,#ffe0f2,#dff5ff,#fff4c7);font-size:19px;font-weight:bold}
+.gacha-effect.show{display:block}
 body.blue{background:radial-gradient(circle at top,#f0fdff,#d8efff 50%,#c8c5ff)}
 body.blue .room{background:linear-gradient(145deg,#fff,#eafaff,#e7e1ff)}
 body.night{background:radial-gradient(circle at top,#e4d9ff,#b4a1e8 65%,#7868a9);color:#49366c}
@@ -41,11 +41,11 @@ body.night .room{background:linear-gradient(145deg,#fff,#f0e8ff,#e2d8ff)}
 <h1>🎀 きゅんきゅん♡育成ルーム 🎀</h1>
 <p>毎日会って、もっと仲良くなろう♡</p>
 
-<div class="girl" id="girl">
+<div class="girl" id="girl" onclick="touchGirl()">
 <img src="./IMG_4703.png" alt="女の子">
 </div>
+<p class="small">♡ キャラクターをタップしてね ♡</p>
 <h2 id="name">ももちゃん</h2>
-
 <div class="panel">
 <input id="nameInput" maxlength="20" placeholder="好きな名前を入力">
 <button onclick="changeName()">名前を変更</button>
@@ -53,7 +53,7 @@ body.night .room{background:linear-gradient(145deg,#fff,#f0e8ff,#e2d8ff)}
 
 <div class="status">
 <div>💗 好感度：<b id="love">0</b></div>
-<div class="bar"><div id="fill"></div></div>
+<div class="bar"><div id="fill" style="width:0%"></div></div>
 <p>🌸 レベル：<b id="level">1</b></p>
 <p>💰 コイン：<b id="coins">0</b></p>
 <p id="message">「もっと一緒にいて？」</p>
@@ -65,21 +65,20 @@ body.night .room{background:linear-gradient(145deg,#fff,#f0e8ff,#e2d8ff)}
 
 <div class="panel">
 <h3>🎁 毎日ログインボーナス</h3>
-<p>1日1回、コインを10枚プレゼント！</p>
-<button id="dailyBtn" onclick="dailyBonus()">🎀 ボーナスを受け取る</button>
+<p>1日1回、10コイン！</p>
+<button id="dailyBtn" onclick="dailyBonus()">🎀 受け取る</button>
 <p class="small" id="dailyMsg"></p>
 </div>
 
 <div class="panel">
 <h3>👗 衣装コレクション</h3>
-<p class="small">持っている衣装を選んで着替えよう！</p>
 <div class="grid" id="wardrobe"></div>
 </div>
 
 <div class="panel">
 <h3>🎀 衣装ガチャ</h3>
 <p>20コインで衣装をゲット！</p>
-<button onclick="gacha()">🎁 ガチャを引く（20コイン）</button>
+<button onclick="gacha()">🎁 ガチャを引く</button>
 <div id="gachaEffect" class="gacha-effect"></div>
 <h4>📜 ガチャ履歴</h4>
 <ul id="gachaHistoryList" class="history"></ul>
@@ -87,18 +86,44 @@ body.night .room{background:linear-gradient(145deg,#fff,#f0e8ff,#e2d8ff)}
 
 <div class="panel">
 <h3>💬 おしゃべり</h3>
-<p id="dialogue">会いに来てくれてうれしいな♡</p>
+<p class="dialogue" id="dialogue">会いに来てくれてうれしいな♡</p>
 <button onclick="talk()">💗 お話しする</button>
 </div>
 
 <div class="panel">
-<h3>🏰 お部屋の模様替え</h3>
-<p class="small">好きなお部屋を選んでね♡</p>
-<button onclick="changeRoom('pink')">🌸 ピンクのお部屋</button>
-<button onclick="changeRoom('blue')">🩵 水色のお部屋</button>
-<button onclick="changeRoom('night')">💜 ゆめかわのお部屋</button>
+<h3>📖 ふたりのストーリー</h3>
+<p class="small">仲良くなると、新しいお話が解放されるよ♡</p>
+<div id="storyList"></div>
 </div>
 
+<div class="panel">
+<h3>🛍️ きゅんきゅんショップ</h3>
+<p class="small">コインで衣装や家具を購入しよう！</p>
+<div class="grid" id="shopList"></div>
+</div>
+
+<div class="panel">
+<h3>🪑 お部屋の家具</h3>
+<p id="furnitureList" class="small"></p>
+</div>
+
+<div class="panel">
+<h3>🎯 デイリーミッション</h3>
+<p class="small">毎日更新！達成したら報酬を受け取ろう。</p>
+<div id="missionList"></div>
+</div>
+
+<div class="panel">
+<h3>🏆 実績コレクション</h3>
+<div id="achievementList"></div>
+</div>
+
+<div class="panel">
+<h3>🏰 お部屋の模様替え</h3>
+<button onclick="changeRoom('pink')">🌸 ピンク</button>
+<button onclick="changeRoom('blue')">🩵 水色</button>
+<button onclick="changeRoom('night')">💜 ゆめかわ</button>
+</div>
 <p class="small" id="giftmsg">遊んでくれてありがとう♡</p>
 </div>
 
@@ -108,18 +133,30 @@ const outfits={
   1:{name:"黒ゴシックドレス",src:"./FE8A9EB6-3670-401F-8B25-55872A7FD3B9.png"},
   2:{name:"水色の天使衣装",src:"./EE85B7A1-94BB-4D24-9E85-62DE2F751731.png"}
 };
+
+const shopItems=[
+ {id:"outfit1",name:"黒ゴシックドレス",type:"outfit",target:1,price:80,desc:"漆黒の特別なドレス"},
+ {id:"outfit2",name:"水色の天使衣装",type:"outfit",target:2,price:80,desc:"ふわふわ天使の衣装"},
+ {id:"heart",name:"ハートのクッション",type:"furniture",price:25,desc:"かわいい家具"},
+ {id:"star",name:"星のランプ",type:"furniture",price:40,desc:"夜空みたいにきらきら"},
+ {id:"bear",name:"くまのぬいぐるみ",type:"furniture",price:50,desc:"お部屋のおともだち"}
+];
+
 const defaultSave={
-  love:0,coins:0,power:1,outfit:0,ownedOutfits:[0],
-  gachaHistory:[],lastBonus:"",room:"pink",name:"ももちゃん"
+ love:0,coins:0,power:1,outfit:0,ownedOutfits:[0],
+ gachaHistory:[],lastBonus:"",room:"pink",name:"ももちゃん"
 };
+
 let data;
-try{
-  data={...defaultSave,...JSON.parse(localStorage.getItem("kyunkyunSave")||"{}")};
-}catch(e){data={...defaultSave};}
+try {
+ data={...defaultSave,...JSON.parse(localStorage.getItem("kyunkyunSave")||"{}")};
+} catch(e) {
+ data={...defaultSave};
+}
 data.ownedOutfits=Array.isArray(data.ownedOutfits)?data.ownedOutfits:[0];
 data.gachaHistory=Array.isArray(data.gachaHistory)?data.gachaHistory:[];
-let love=Number(data.love)||0;
-let coins=Number(data.coins)||0;
+let love=Math.max(0,Number(data.love)||0);
+let coins=Math.max(0,Number(data.coins)||0);
 let power=Math.max(1,Number(data.power)||1);
 let outfit=Number(data.outfit)||0;
 let ownedOutfits=data.ownedOutfits;
@@ -127,152 +164,269 @@ let gachaHistory=data.gachaHistory;
 let characterName=localStorage.getItem("kyunkyunName")||data.name||"ももちゃん";
 let room=data.room||"pink";
 
+/* 新しい進行データ。以前のセーブ内容は残す */
+data.furniture=Array.isArray(data.furniture)?data.furniture:[];
+data.purchases=Array.isArray(data.purchases)?data.purchases:[];
+data.stats=data.stats||{taps:0,gifts:0,gachas:0,stories:0};
+data.claimedMissions=data.claimedMissions||{};
+data.achievements=data.achievements||{};
+data.missionDay=data.missionDay||"";
+data.storySeen=Array.isArray(data.storySeen)?data.storySeen:[];
+
+function dayKey(){
+ const d=new Date();
+ return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();
+}
+function levelNow(){return Math.floor(love/10)+1}
 function saveGame(){
-  localStorage.setItem("kyunkyunSave",JSON.stringify({
-    love,coins,power,outfit,ownedOutfits,gachaHistory,
-    lastBonus:data.lastBonus||"",room,name:characterName
-  }));
-  localStorage.setItem("kyunkyunName",characterName);
+ data.love=love;data.coins=coins;data.power=power;data.outfit=outfit;
+ data.ownedOutfits=ownedOutfits;data.gachaHistory=gachaHistory;
+ data.room=room;data.name=characterName;
+ localStorage.setItem("kyunkyunSave",JSON.stringify(data));
+ localStorage.setItem("kyunkyunName",characterName);
 }
-function today(){
-  const d=new Date();
-  return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();
-}
+function say(text){document.getElementById("giftmsg").textContent=text}
 function update(){
-  const level=Math.floor(love/10)+1;
-  document.getElementById("love").textContent=love;
-  document.getElementById("coins").textContent=coins;
-  document.getElementById("level").textContent=level;
-  document.getElementById("fill").style.width=(love%10)*10+"%";
-  const messages=[
-    "「もっと一緒にいて？」",
-    "「えへへ、うれしいな♡」",
-    "「あなたが大好き！」",
-    "「これからもずっと一緒だよ♡」"
-  ];
-  document.getElementById("message").textContent=
-    messages[Math.min(3,Math.floor((level-1)/3))];
-  document.getElementById("name").textContent=characterName;
-  const received=data.lastBonus===today();
-  document.getElementById("dailyBtn").disabled=received;
-  document.getElementById("dailyBtn").textContent=received?"✅ 今日は受取済み":"🎀 ボーナスを受け取る";
-  document.getElementById("dailyMsg").textContent=received?"今日のボーナスは受取済みだよ♡":"毎日1回、10コインもらえるよ♡";
-  document.getElementById("dailyBtn").style.opacity=received?".55":"1";
-}
-function say(text){
-  document.getElementById("giftmsg").textContent=text;
+ const level=levelNow();
+ document.getElementById("love").textContent=love;
+ document.getElementById("coins").textContent=coins;
+ document.getElementById("level").textContent=level;
+ document.getElementById("fill").style.width=(love%10)*10+"%";
+ document.getElementById("name").textContent=characterName;
+ document.getElementById("message").textContent=
+  ["「もっと一緒にいて？」","「えへへ、うれしいな♡」",
+   "「あなたが大好き！」","「これからもずっと一緒だよ♡」"]
+  [Math.min(3,Math.floor((level-1)/3))];
+ const received=data.lastBonus===dayKey();
+ const btn=document.getElementById("dailyBtn");
+ btn.disabled=received;
+ btn.textContent=received?"✅ 今日は受取済み":"🎀 ボーナスを受け取る";
+ document.getElementById("dailyMsg").textContent=received?
+  "今日のボーナスは受取済みだよ♡":"毎日1回、10コインもらえるよ♡";
 }
 function tapLove(){
-  love+=power;coins++;
-  update();say("きゅんっ♡ 好感度アップ！");
-  saveGame();
+ love+=power;coins++;data.stats.taps++;
+ update();say("きゅんっ♡ 好感度アップ！");
+ afterAction();saveGame();
+}
+function touchGirl(){
+ love++;coins++;data.stats.taps++;
+ const lines=["きゃっ♡ くすぐったいよ！","えへへ、もっと触って♡",
+  "あなたの手、あったかいね♡","もう、照れちゃうよ…！"];
+ document.getElementById("dialogue").textContent=lines[Math.floor(Math.random()*lines.length)];
+ update();say("タップしてくれてうれしい♡");
+ afterAction();saveGame();
 }
 function gift(){
-  if(coins<5){say("コインが足りないよ！なでなでして集めよう♡");return;}
-  coins-=5;love+=5;update();
-  say("プレゼントを渡したよ！うれしいな♡");saveGame();
+ if(coins<5){say("コインが足りないよ！なでなでして集めよう♡");return}
+ coins-=5;love+=5;data.stats.gifts++;
+ update();say("プレゼントを渡したよ！うれしいな♡");
+ afterAction();saveGame();
 }
 function buyUpgrade(){
-  if(coins<20){say("コインが足りないよ！");return;}
-  coins-=20;power++;update();
-  say("強化成功！なでなで効果＋1♡");saveGame();
+ if(coins<20){say("コインが足りないよ！");return}
+ coins-=20;power++;update();say("強化成功！なでなで効果＋1♡");saveGame();
 }
 function changeName(){
-  const input=document.getElementById("nameInput");
-  const name=input.value.trim();
-  if(!name){say("名前を入力してね♡");return;}
-  characterName=name;input.value="";
-  update();saveGame();say("これからは"+characterName+"って呼ぶね♡");
+ const input=document.getElementById("nameInput"),name=input.value.trim();
+ if(!name){say("名前を入力してね♡");return}
+ characterName=name;input.value="";update();saveGame();
+ say("これからは"+characterName+"って呼ぶね♡");
 }
 function setOutfit(id){
-  if(!ownedOutfits.includes(id)){say("まだ持っていない衣装だよ♡");return;}
-  outfit=id;
-  const item=outfits[id]||outfits[0];
-  document.getElementById("girl").innerHTML=
-    '<img src="'+item.src+'" alt="'+item.name+'">';
-  saveGame();renderWardrobe();
-  say(item.name+"にお着替えしたよ♡");
+ if(!ownedOutfits.includes(id)){say("まだ持っていない衣装だよ♡");return}
+ outfit=id;showOutfit();renderWardrobe();saveGame();
+ say(outfits[id].name+"にお着替えしたよ♡");
+}
+function showOutfit(){
+ const item=outfits[outfit]||outfits[0];
+ document.getElementById("girl").querySelector("img").src=item.src;
+ document.getElementById("girl").querySelector("img").alt=item.name;
 }
 function renderWardrobe(){
-  const box=document.getElementById("wardrobe");
-  box.innerHTML="";
-  ownedOutfits.forEach(id=>{
-    const item=outfits[id];if(!item)return;
-    const card=document.createElement("div");
-    card.className="card";
-    const img=document.createElement("img");
-    img.src=item.src;img.alt=item.name;
-    const label=document.createElement("p");
-    label.textContent=(id===outfit?"✅ ":"")+item.name;
-    const btn=document.createElement("button");
-    btn.textContent=id===outfit?"着用中":"着替える";
-    btn.onclick=()=>setOutfit(id);
-    card.append(img,label,btn);box.appendChild(card);
-  });
+ const box=document.getElementById("wardrobe");box.innerHTML="";
+ ownedOutfits.forEach(id=>{
+  const item=outfits[id];if(!item)return;
+  const card=document.createElement("div");card.className="card";
+  const img=document.createElement("img");img.src=item.src;img.alt=item.name;
+  const p=document.createElement("p");p.textContent=(id===outfit?"✅ ":"")+item.name;
+  const btn=document.createElement("button");
+  btn.textContent=id===outfit?"着用中":"着替える";
+  btn.disabled=id===outfit;btn.onclick=()=>setOutfit(id);
+  card.append(img,p,btn);box.appendChild(card);
+ });
 }
 function renderGachaHistory(){
-  const list=document.getElementById("gachaHistoryList");
-  list.innerHTML="";
-  if(!gachaHistory.length){
-    const li=document.createElement("li");
-    li.textContent="まだ衣装を引いていないよ♡";
-    list.appendChild(li);return;
-  }
-  gachaHistory.slice().reverse().forEach(id=>{
-    const li=document.createElement("li");
-    li.textContent=(outfits[id]?.name||"衣装")+"を引いたよ";
-    list.appendChild(li);
-  });
+ const list=document.getElementById("gachaHistoryList");list.innerHTML="";
+ if(!gachaHistory.length){list.textContent="まだ衣装を引いていないよ♡";return}
+ gachaHistory.slice().reverse().forEach(id=>{
+  const li=document.createElement("li");li.textContent=(outfits[id]?.name||"衣装")+"を引いたよ";list.appendChild(li);
+ });
 }
 function gacha(){
-  if(coins<20){say("コインが20枚必要だよ♡");return;}
-  coins-=20;
-  const effect=document.getElementById("gachaEffect");
-  effect.classList.remove("show");
-  void effect.offsetWidth;
-  const prize=Math.random()<.5?1:2;
-  effect.textContent=prize===1?"✨🖤 黒ゴシックドレス！ 🖤✨":"✨🩵 水色の天使衣装！ 🩵✨";
-  effect.classList.add("show");
-  if(ownedOutfits.includes(prize)){
-    coins+=10;
-    say("衣装がかぶっちゃった！10コイン返還♡");
-  }else{
-    ownedOutfits.push(prize);
-    say(outfits[prize].name+"をゲット♡");
-  }
-  gachaHistory.push(prize);
-  update();renderWardrobe();renderGachaHistory();saveGame();
+ if(coins<20){say("コインが20枚必要だよ♡");return}
+ coins-=20;data.stats.gachas++;
+ const prize=Math.random()<.5?1:2;
+ const effect=document.getElementById("gachaEffect");
+ effect.textContent=prize===1?"✨🖤 黒ゴシックドレス！ 🖤✨":"✨🩵 水色の天使衣装！ 🩵✨";
+ effect.classList.add("show");
+ if(ownedOutfits.includes(prize)){coins+=10;say("衣装がかぶっちゃった！10コイン返還♡")}
+ else{ownedOutfits.push(prize);say(outfits[prize].name+"をゲット♡")}
+ gachaHistory.push(prize);
+ update();renderWardrobe();renderGachaHistory();afterAction();saveGame();
 }
 function dailyBonus(){
-  if(data.lastBonus===today()){say("今日のボーナスは受取済みだよ♡");return;}
-  coins+=10;data.lastBonus=today();
-  update();saveGame();say("ログインボーナス！10コインを受け取ったよ♡");
+ if(data.lastBonus===dayKey()){say("今日のボーナスは受取済みだよ♡");return}
+ coins+=10;data.lastBonus=dayKey();update();saveGame();
+ say("ログインボーナス！10コインを受け取ったよ♡");
 }
 function talk(){
-  const level=Math.floor(love/10)+1;
-  const lines=level<3
-    ?[""+characterName+"だよね？来てくれてうれしい♡","もう少し一緒にいたいな…！","今日は何して遊ぶ？"]
-    :level<7
-    ?[characterName+"、会いたかったよ♡","なでなで、もっとして？","あなたといると安心するな♡"]
-    :[characterName+"がいちばん大好き！♡","ずっと一緒にいてくれる？","今日は特別に甘えちゃおうかな♡"];
-  document.getElementById("dialogue").textContent=
-    lines[Math.floor(Math.random()*lines.length)];
+ const level=levelNow();
+ const lines=level<3?
+  [characterName+"、来てくれてうれしい♡","もう少し一緒にいたいな…！","今日は何して遊ぶ？"]:
+  level<7?
+  [characterName+"、会いたかったよ♡","なでなで、もっとして？","あなたといると安心するな♡"]:
+  [characterName+"がいちばん大好き！♡","ずっと一緒にいてくれる？","今日は特別に甘えちゃおうかな♡"];
+ document.getElementById("dialogue").textContent=lines[Math.floor(Math.random()*lines.length)];
+}
+
+/* ストーリー */
+const stories=[
+ {level:1,title:"第1話 はじめまして",text:"「来てくれてありがとう♡ これからいっぱい仲良くなろうね！」"},
+ {level:3,title:"第2話 小さな約束",text:"「明日も会いに来てくれる？ ふたりだけの約束だよ♡」"},
+ {level:5,title:"第3話 ふたりの秘密",text:"「実はね、あなたが来てくれる時間がいちばん好きなんだ♡」"},
+ {level:10,title:"第4話 特別な気持ち",text:"「あなたと過ごした日々、ぜんぶ大切な宝物だよ！」"}
+];
+function renderStories(){
+ const box=document.getElementById("storyList");box.innerHTML="";
+ stories.forEach((s,i)=>{
+  const div=document.createElement("div");div.className="story";
+  const title=document.createElement("b");title.textContent=s.title;
+  div.appendChild(title);
+  if(levelNow()<s.level){
+   const p=document.createElement("p");p.textContent="🔒 レベル"+s.level+"で解放";div.appendChild(p);
+  }else{
+   const btn=document.createElement("button");
+   btn.textContent=data.storySeen.includes(i)?"もう一度読む":"読む";
+   btn.onclick=()=>{
+    document.getElementById("dialogue").textContent=s.text;
+    data.storySeen=[...new Set([...data.storySeen,i])];
+    data.stats.stories++;say(s.title+"を読んだよ♡");
+    afterAction();saveGame();renderStories();
+   };
+   div.appendChild(btn);
+  }
+  box.appendChild(div);
+ });
+}
+
+/* ショップ */
+function buyItem(id){
+ const item=shopItems.find(x=>x.id===id);if(!item)return;
+ if(data.purchases.includes(id)){say("これはもう購入済みだよ♡");return}
+ if(item.type==="outfit"&&ownedOutfits.includes(item.target)){
+  say("この衣装はもう持っているよ♡");return;
+ }
+ if(coins<item.price){say("コインが足りないよ！");return}
+ coins-=item.price;
+ data.purchases.push(id);
+ if(item.type==="outfit")ownedOutfits.push(item.target);
+ if(item.type==="furniture")data.furniture.push(id);
+ say(item.name+"を購入したよ！♡");
+ update();renderShop();renderWardrobe();renderFurniture();afterAction();saveGame();
+}
+function renderShop(){
+ const box=document.getElementById("shopList");box.innerHTML="";
+ shopItems.forEach(item=>{
+  const owned=data.purchases.includes(item.id)||
+   (item.type==="outfit"&&ownedOutfits.includes(item.target));
+  const card=document.createElement("div");card.className="card";
+  if(item.type==="outfit"){
+   const img=document.createElement("img");img.src=outfits[item.target].src;img.alt=item.name;card.appendChild(img);
+  }else{
+   const icon=document.createElement("div");icon.style.fontSize="55px";icon.textContent=({heart:"💗",star:"🌟",bear:"🧸"})[item.id];card.appendChild(icon);
+  }
+  const p=document.createElement("p");p.textContent=item.name;card.appendChild(p);
+  const desc=document.createElement("p");desc.textContent=item.desc;card.appendChild(desc);
+  const btn=document.createElement("button");
+  btn.textContent=owned?"購入済み":"💰 "+item.price+"コイン";
+  btn.disabled=owned;btn.onclick=()=>buyItem(item.id);card.appendChild(btn);
+  box.appendChild(card);
+ });
+}
+function renderFurniture(){
+ const names=data.furniture.map(id=>shopItems.find(x=>x.id===id)?.name).filter(Boolean);
+ document.getElementById("furnitureList").textContent=names.length?
+  "お部屋にある家具："+names.join("、")+" ♡":"まだ家具がないよ。ショップで買ってみてね♡";
+}
+
+/* デイリーミッション */
+function resetMissions(){
+ if(data.missionDay!==dayKey()){data.missionDay=dayKey();data.claimedMissions={};}
+}
+const missions=[
+ {id:"tap",title:"なでなで・タップを5回",goal:5,reward:5,value:()=>data.stats.taps},
+ {id:"gift",title:"プレゼントを1回贈る",goal:1,reward:10,value:()=>data.stats.gifts},
+ {id:"talk",title:"おしゃべり・ストーリーを楽しむ",goal:1,reward:5,value:()=>data.stats.stories+talkCount}
+];
+let talkCount=0;
+function renderMissions(){
+ resetMissions();
+ const box=document.getElementById("missionList");box.innerHTML="";
+ missions.forEach(m=>{
+  const count=Math.min(m.goal,m.value());
+  const done=count>=m.goal,claimed=!!data.claimedMissions[m.id];
+  const div=document.createElement("div");div.className="story";
+  const p=document.createElement("p");p.textContent=m.title+" ("+count+"/"+m.goal+")";
+  const btn=document.createElement("button");
+  btn.textContent=claimed?"✅ 受取済み":done?"🎁 "+m.reward+"コインを受け取る":"挑戦中";
+  btn.disabled=!done||claimed;
+  btn.onclick=()=>{
+   if(data.claimedMissions[m.id]||m.value()<m.goal)return;
+   data.claimedMissions[m.id]=true;coins+=m.reward;
+   say("ミッション達成！"+m.reward+"コイン獲得♡");
+   update();renderMissions();saveGame();
+  };
+  div.append(p,btn);box.appendChild(div);
+ });
+}
+
+/* 実績 */
+const achievements=[
+ {id:"tap10",title:"ふれあい入門",desc:"タップ・なでなで10回",check:()=>data.stats.taps>=10},
+ {id:"love50",title:"愛情たっぷり",desc:"好感度50達成",check:()=>love>=50},
+ {id:"level5",title:"仲良しレベル5",desc:"レベル5達成",check:()=>levelNow()>=5},
+ {id:"wardrobe",title:"おしゃれ好き",desc:"衣装を3着集める",check:()=>ownedOutfits.length>=3},
+ {id:"furniture",title:"お部屋づくり",desc:"家具を3個集める",check:()=>data.furniture.length>=3},
+ {id:"story",title:"物語の思い出",desc:"ストーリーを1つ読む",check:()=>data.storySeen.length>=1}
+];
+function renderAchievements(){
+ const box=document.getElementById("achievementList");box.innerHTML="";
+ achievements.forEach(a=>{
+  const done=!!data.achievements[a.id]||a.check();
+  if(done)data.achievements[a.id]=true;
+  const div=document.createElement("div");div.className="story";
+  div.textContent=(done?"🏆 ":"🔒 ")+a.title+" — "+a.desc;
+  box.appendChild(div);
+ });
+}
+function afterAction(){
+ renderStories();renderMissions();renderAchievements();
 }
 function changeRoom(theme){
-  room=theme;
-  document.body.classList.remove("blue","night");
-  if(theme==="blue")document.body.classList.add("blue");
-  if(theme==="night")document.body.classList.add("night");
-  saveGame();say("お部屋を模様替えしたよ♡");
+ room=theme;
+ document.body.classList.remove("blue","night");
+ if(theme==="blue")document.body.classList.add("blue");
+ if(theme==="night")document.body.classList.add("night");
+ saveGame();say("お部屋を模様替えしたよ♡");
 }
 function restore(){
-  document.body.classList.remove("blue","night");
-  if(room==="blue")document.body.classList.add("blue");
-  if(room==="night")document.body.classList.add("night");
-  const item=outfits[outfit]||outfits[0];
-  document.getElementById("girl").innerHTML=
-    '<img src="'+item.src+'" alt="'+item.name+'">';
-  update();renderWardrobe();renderGachaHistory();
+ document.body.classList.remove("blue","night");
+ if(room==="blue")document.body.classList.add("blue");
+ if(room==="night")document.body.classList.add("night");
+ if(!outfits[outfit]||!ownedOutfits.includes(outfit))outfit=0;
+ showOutfit();update();renderWardrobe();renderGachaHistory();
+ renderShop();renderFurniture();afterAction();saveGame();
 }
 restore();
 </script>
