@@ -2598,5 +2598,268 @@ saveGame();
 
 /* BGMはユーザーがONにしたときに再生 */
 </script>
+
+<style>
+/* =====================================
+   Season 2 UI 修正版
+   スマホ表示・吹き出し・文字色
+===================================== */
+
+/* ===== 全体の文字色 ===== */
+body{
+ color:#543457;
+}
+
+.panel{
+ color:#5b3b63;
+}
+
+.panel h2,
+.panel h3{
+ color:#a34c96;
+}
+
+.card,
+.story{
+ color:#513654 !important;
+ background:#fff7fd !important;
+}
+
+.card p,
+.card h3,
+.story p,
+.story h3,
+.story span,
+.story b{
+ color:#513654 !important;
+}
+
+.pill{
+ color:#693e70 !important;
+}
+
+/* ===== ホームだけダーク ===== */
+#page-home{
+ color:#fff0fa;
+}
+
+.home-extras .panel{
+ color:#fff0fa;
+ background:#291c3e;
+}
+
+.home-extras .panel h3{
+ color:#ffc2eb;
+}
+
+.home-extras .story{
+ background:#392747 !important;
+ border-color:#a26b9f;
+ color:#fff0fa !important;
+}
+
+.home-extras .story p,
+.home-extras .story h3,
+.home-extras .story span,
+.home-extras .story b{
+ color:#fff0fa !important;
+}
+
+/* ===== ホームのキャラ配置 ===== */
+.home-stage{
+ min-height:760px;
+ height:100svh;
+}
+
+.home-character{
+ bottom:115px;
+ height:63%;
+}
+
+.home-character img{
+ max-height:100%;
+}
+
+/* ===== ステータス表示 ===== */
+.home-stats{
+ top:110px;
+ left:12px;
+ width:190px;
+}
+
+.stat-box{
+ padding:10px;
+}
+
+.stat-box,
+.stat-box span,
+.stat-box strong,
+.stat-box b{
+ color:#fff0fa;
+}
+
+/* ===== 吹き出し ===== */
+/* 顔やステータスの上に重ならないよう下へ */
+.speech{
+ top:auto;
+ bottom:245px;
+ left:auto;
+ right:85px;
+ width:165px;
+ max-width:calc(100% - 105px);
+ padding:10px;
+ font-size:12px;
+ line-height:1.5;
+ color:white;
+ background:#241332e8;
+ border:1px solid #ff9ee0;
+ box-shadow:0 0 12px #ff77d077;
+}
+
+/* ===== なでなで・おしゃべり ===== */
+.home-actions{
+ left:12px;
+ bottom:105px;
+ gap:9px;
+}
+
+.heart-btn{
+ width:112px;
+ height:100px;
+ font-size:17px;
+}
+
+.home-actions button:not(.heart-btn){
+ width:112px;
+ padding:10px 5px;
+ font-size:12px;
+}
+
+/* ===== 右側メニュー ===== */
+.home-menu{
+ right:9px;
+ top:175px;
+ gap:8px;
+}
+
+.home-menu button{
+ width:62px;
+ min-height:58px;
+ font-size:10px;
+}
+
+/* ===== 下部の情報 ===== */
+.home-bottom{
+ bottom:14px;
+ left:12px;
+ right:83px;
+ padding:9px;
+ font-size:11px;
+}
+
+/* ===== 通知 ===== */
+#giftmsg{
+ position:fixed;
+ z-index:50;
+ bottom:100px;
+ left:50%;
+ transform:translateX(-50%);
+ max-width:85%;
+ padding:10px 14px;
+ color:white;
+ background:#291436f0;
+ border:1px solid #ffa7e5;
+ border-radius:20px;
+ text-align:center;
+ font-size:12px;
+ opacity:0;
+ visibility:hidden;
+ pointer-events:none;
+ transition:opacity .2s,visibility .2s;
+}
+
+#giftmsg.show{
+ opacity:1;
+ visibility:visible;
+}
+
+/* ===== スマホ ===== */
+@media(max-width:430px){
+ .home-logo{
+  top:18px;
+  left:12px;
+  font-size:21px;
+ }
+
+ .home-stats{
+  top:105px;
+  width:175px;
+ }
+
+ .home-menu{
+  top:165px;
+ }
+
+ .speech{
+  bottom:250px;
+  right:80px;
+  width:150px;
+ }
+
+ .home-character{
+  height:61%;
+  bottom:130px;
+ }
+
+ .home-actions{
+  bottom:110px;
+ }
+}
+
+/* ===== 小さい画面 ===== */
+@media(max-width:375px){
+ .home-stats{
+  width:155px;
+ }
+
+ .home-menu button{
+  width:55px;
+  min-height:53px;
+ }
+
+ .speech{
+  right:72px;
+  width:135px;
+  font-size:11px;
+ }
+
+ .heart-btn{
+  width:100px;
+  height:90px;
+ }
+}
+</style>
+
+<script>
+/* ===== 通知を3秒で消す ===== */
+let messageTimer=null;
+
+function say(text){
+ const el=document.getElementById("giftmsg");
+ if(!el)return;
+
+ el.textContent=text;
+ el.classList.add("show");
+
+ if(messageTimer){
+  clearTimeout(messageTimer);
+ }
+
+ messageTimer=setTimeout(()=>{
+  el.classList.remove("show");
+ },3000);
+}
+</script>
+
 </body>
 </html>
