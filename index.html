@@ -2861,5 +2861,418 @@ function say(text){
 }
 </script>
 
+<!-- ===== きゅんきゅん育成ルーム Season 2 ===== -->
+<style>
+#season2Panel{
+  margin:14px 0;
+  padding:15px;
+  border-radius:18px;
+  background:linear-gradient(135deg,#fff0fa,#f2eaff);
+  color:#49314d;
+  box-shadow:0 4px 16px #0001;
+}
+#season2Panel h3{color:#a33686;margin:6px 0 12px}
+.s2-card{
+  background:white;
+  color:#49314d;
+  border-radius:14px;
+  padding:12px;
+  margin:9px 0;
+}
+.s2-btn{
+  border:0;
+  border-radius:12px;
+  background:linear-gradient(135deg,#ff72bb,#ad78ee);
+  color:white;
+  font-weight:bold;
+  padding:10px 15px;
+  margin:5px 3px;
+}
+.s2-btn:disabled{opacity:.45}
+.s2-progress{
+  height:9px;
+  border-radius:20px;
+  background:#ead5e8;
+  overflow:hidden;
+  margin:8px 0;
+}
+.s2-progress>div{
+  height:100%;
+  background:linear-gradient(90deg,#ff78bb,#ae70ed);
+}
+.s2-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+.s2-item{
+  background:white;
+  border-radius:14px;
+  padding:10px;
+  text-align:center;
+  color:#49314d;
+}
+.s2-item img{
+  width:100%;
+  height:140px;
+  object-fit:contain;
+  border-radius:10px;
+}
+.s2-item small{display:block;margin:5px 0}
+#s2Toast{
+  position:fixed;
+  left:50%;
+  bottom:105px;
+  transform:translateX(-50%);
+  background:#392044;
+  color:white;
+  padding:12px 18px;
+  border-radius:16px;
+  z-index:99999;
+  max-width:88vw;
+  text-align:center;
+  box-shadow:0 5px 25px #0005;
+  display:none;
+}
+</style>
+
+<div id="s2Toast"></div>
+
+<script>
+(function(){
+"use strict";
+
+const S2_KEY="kyunkyunSeason2";
+const S2_VERSION=2;
+
+const S2_OUTFITS=[
+ {id:"darkrose",name:"🥀 ダークローズ",img:"4FCA0CD0-DC95-4086-880C-6F9442628B1D.png"},
+ {id:"starangel",name:"🌟 星詠みの天使",img:"1DE1C73E-5D2B-45BC-9BF1-A8E1B07C8D9B.png"},
+ {id:"oiran",name:"🌸 花魁風和服",img:"ED6971DB-EDED-408F-A5DF-4185A0D4F660.png"},
+ {id:"summer",name:"🏝️ サマーリゾート水着",img:"9280B4A0-04F6-426B-8CC5-AF414A04ED17.png"},
+ {id:"classic",name:"🖤 クラシカルロリータ",img:"DC6904DF-4EF6-4A04-8681-59F56826EAE7.png"}
+];
+
+const S2_BACKGROUNDS=[
+ {id:"rosepalace",name:"🥀 黒薔薇の宮殿",price:300,img:"D9C14D9A-78D7-4D83-8A01-BF6FFC167FBE.png"},
+ {id:"starroom",name:"🌟 星降る天界のお部屋",price:350,img:"79D6A7E6-EC7E-4E29-88F7-2310AB514DB0.png"},
+ {id:"sakur room".replace(" ",""),name:"🌸 桜の和室",price:400,img:"FE8EA758-9B19-409F-A009-0C121CCE31B4.png"},
+ {id:"villa",name:"🏝️ 南国リゾートヴィラ",price:450,img:"83307543-0242-426E-BC16-7815623CA83E.png"},
+ {id:"classicroom",name:"🖤 クラシカルロリータのお部屋",price:500,img:"C35BDFA6-223A-4856-9829-F3F241A84839.png"}
+];
+
+function loadS2(){
+ try{
+  const saved=JSON.parse(localStorage.getItem(S2_KEY)||"{}");
+  return {
+   version:S2_VERSION,
+   tickets:Math.max(0,Number(saved.tickets)||0),
+   claimedLevels:Array.isArray(saved.claimedLevels)?saved.claimedLevels:[],
+   titles:Array.isArray(saved.titles)?saved.titles:[],
+   seenEvents:Array.isArray(saved.seenEvents)?saved.seenEvents:[],
+   equippedTitle:saved.equippedTitle||""
+  };
+ }catch(e){
+  return {version:S2_VERSION,tickets:0,claimedLevels:[],titles:[],seenEvents:[],equippedTitle:""};
+ }
+}
+
+const s2=loadS2();
+
+function saveS2(){
+ localStorage.setItem(S2_KEY,JSON.stringify(s2));
+ if(typeof saveGame==="function")saveGame();
+}
+
+function toastS2(message){
+ const el=document.getElementById("s2Toast");
+ if(!el)return;
+ el.textContent=message;
+ el.style.display="block";
+ clearTimeout(toastS2.timer);
+ toastS2.timer=setTimeout(()=>el.style.display="none",2800);
+}
+
+function currentCharS2(){
+ try{return typeof cd==="function"?cd():null}catch(e){return null}
+}
+
+function levelS2(){
+ try{return typeof levelNow==="function"?Math.max(1,Math.floor(levelNow())):1}
+ catch(e){return 1}
+}
+
+function coinsS2(){
+ return Number(data.coins)||0;
+}
+
+function addCoinsS2(n){
+ data.coins=Math.max(0,coinsS2()+n);
+}
+
+function ownedOutfitsS2(){
+ if(!Array.isArray(data.ownedOutfits))data.ownedOutfits=[];
+ return data.ownedOutfits;
+}
+
+function ownedBackgroundsS2(){
+ if(!Array.isArray(data.ownedBackgrounds))data.ownedBackgrounds=[];
+ return data.ownedBackgrounds;
+}
+
+function registerAssetsS2(){
+ if(typeof outfits!=="undefined"&&Array.isArray(outfits)){
+  S2_OUTFITS.forEach(item=>{
+   if(!outfits.some(x=>x.id===item.id)){
+    outfits.push({...item,price:50});
+   }
+  });
+ }
+ if(typeof backgrounds!=="undefined"&&Array.isArray(backgrounds)){
+  S2_BACKGROUNDS.forEach(item=>{
+   if(!backgrounds.some(x=>x.id===item.id)){
+    backgrounds.push({...item});
+   }
+  });
+ }
+}
+
+function findOutfitS2(id){
+ return S2_OUTFITS.find(x=>x.id===id);
+}
+
+function findBackgroundS2(id){
+ return S2_BACKGROUNDS.find(x=>x.id===id);
+}
+
+function refreshS2(){
+ if(typeof update==="function")update();
+ if(typeof renderWardrobe==="function")renderWardrobe();
+ if(typeof renderShop==="function")renderShop();
+ if(typeof renderFurniture==="function")renderFurniture();
+ renderS2();
+}
+
+function s2Gacha(){
+ if(s2.tickets>0){
+  s2.tickets--;
+ }else{
+  if(coinsS2()<50){
+   toastS2("💰 コインが足りないよ！");
+   return;
+  }
+  addCoinsS2(-50);
+ }
+
+ const all=(typeof outfits!=="undefined"&&Array.isArray(outfits))
+  ?outfits.filter(x=>x&&x.id&&x.img)
+  :S2_OUTFITS;
+
+ if(!all.length){
+  toastS2("ガチャの衣装が見つからないよ");
+  return;
+ }
+
+ const item=all[Math.floor(Math.random()*all.length)];
+ const owned=ownedOutfitsS2();
+
+ if(owned.includes(item.id)){
+  addCoinsS2(20);
+  toastS2("🎰 "+item.name+"（重複！20コイン返還）");
+ }else{
+  owned.push(item.id);
+  toastS2("🎉 "+item.name+" をゲット！");
+ }
+
+ saveS2();
+ refreshS2();
+}
+
+function buyBackgroundS2(id){
+ const bg=findBackgroundS2(id);
+ if(!bg)return;
+
+ const owned=ownedBackgroundsS2();
+ if(owned.includes(id)){
+  toastS2("もう持っている背景だよ！");
+  return;
+ }
+ if(coinsS2()<bg.price){
+  toastS2("💰 コインが足りないよ！");
+  return;
+ }
+
+ addCoinsS2(-bg.price);
+ owned.push(id);
+ saveS2();
+ refreshS2();
+ toastS2("🏰 "+bg.name+" を購入したよ！");
+}
+
+function levelRewardsS2(){
+ const lv=levelS2();
+ const result=[];
+ for(let n=10;n<=lv;n+=10){
+  if(!s2.claimedLevels.includes(n)){
+   result.push(n);
+  }
+ }
+ return result;
+}
+
+function claimLevelsS2(){
+ const levels=levelRewardsS2();
+ if(!levels.length){
+  toastS2("受け取れる報酬はまだないよ");
+  return;
+ }
+
+ let coins=0,tickets=0;
+ levels.forEach(lv=>{
+  coins+=50;
+  if(lv%50===0)tickets++;
+  if(lv%100===0){
+   const title="Lv."+lv+" 達成";
+   if(!s2.titles.includes(title))s2.titles.push(title);
+  }
+  s2.claimedLevels.push(lv);
+ });
+
+ addCoinsS2(coins);
+ s2.tickets+=tickets;
+ saveS2();
+ refreshS2();
+ toastS2("🎁 "+coins+"コイン＋チケット"+tickets+"枚を獲得！");
+}
+
+const S2_EVENTS=[
+ {lv:10,title:"はじめての約束",line:"これからも、ずっと一緒にいてくれる？"},
+ {lv:20,title:"ふたりの秘密",line:"これはね、あなたにだけ話す秘密だよ。"},
+ {lv:30,title:"特別なデート",line:"今日は、あなたとふたりでお出かけしたいな。"},
+ {lv:50,title:"恋人への一歩",line:"あなたといると、胸がドキドキするの……。"},
+ {lv:100,title:"運命の相手",line:"何度生まれ変わっても、あなたに会いたい。"},
+ {lv:200,title:"永遠の約束",line:"何年たっても、この気持ちは変わらないよ。"},
+ {lv:500,title:"伝説のパートナー",line:"ふたりで作った思い出は、私の宝物。"},
+ {lv:1000,title:"究極の愛",line:"世界でいちばん大切な人。ずっと大好きだよ。"}
+];
+
+function openEventS2(lv){
+ const ev=S2_EVENTS.find(x=>x.lv===lv);
+ if(!ev||levelS2()<lv)return;
+
+ const char=currentCharS2();
+ const name=char&&char.name?char.name:"女の子";
+ const key=(data.currentCharacter||"default")+":"+lv;
+
+ if(!s2.seenEvents.includes(key)){
+  s2.seenEvents.push(key);
+  addCoinsS2(30);
+ }
+
+ saveS2();
+ refreshS2();
+ alert("💌 "+ev.title+"\n\n"+name+"：\n「"+ev.line+"」\n\n初回閲覧は30コイン！");
+}
+
+function titleS2(){
+ const lv=levelS2();
+ if(lv>=1000)return"究極の愛";
+ if(lv>=500)return"伝説のパートナー";
+ if(lv>=200)return"永遠の約束";
+ if(lv>=100)return"運命の相手";
+ if(lv>=50)return"恋人";
+ if(lv>=20)return"親友";
+ if(lv>=5)return"仲良し";
+ return"知り合い";
+}
+
+function renderS2(){
+ const host=document.getElementById("season2Panel");
+ if(!host)return;
+
+ const pending=levelRewardsS2();
+ const lv=levelS2();
+ const next=Math.ceil((lv+1)/10)*10;
+ const percent=(lv%10)*10;
+
+ host.innerHTML=`
+  <h3>💗 Season 2 育成ボーナス</h3>
+  <div class="s2-card">
+   <b>現在 Lv.${lv}｜関係：${titleS2()}</b>
+   <div class="s2-progress"><div style="width:${percent}%"></div></div>
+   <small>次の報酬：Lv.${next}</small>
+   <p>💰 コイン：${coinsS2()}　🎟️ チケット：${s2.tickets}</p>
+   <button class="s2-btn" onclick="s2ClaimLevels()" ${pending.length?"":"disabled"}>
+    🎁 レベル報酬を受け取る（${pending.length}件）
+   </button>
+  </div>
+  <div class="s2-card">
+   <b>🎰 衣装ガチャ</b>
+   <p>1回50コイン／チケット1枚でもOK</p>
+   <button class="s2-btn" onclick="s2Gacha()">ガチャを回す 💎</button>
+  </div>
+  <div class="s2-card">
+   <b>💌 恋愛イベント</b>
+   ${S2_EVENTS.map(e=>`
+    <button class="s2-btn" ${lv<e.lv?"disabled":""}
+      onclick="s2OpenEvent(${e.lv})">
+      Lv.${e.lv} ${e.title}
+    </button>
+   `).join("")}
+  </div>
+  <div class="s2-card">
+   <b>🏰 新背景ショップ</b>
+   <div class="s2-grid">
+    ${S2_BACKGROUNDS.map(b=>`
+     <div class="s2-item">
+      <img src="${b.img}" alt="${b.name}">
+      <b>${b.name}</b>
+      <small>${b.price}コイン</small>
+      <button class="s2-btn"
+       onclick="s2BuyBackground('${b.id}')"
+       ${ownedBackgroundsS2().includes(b.id)?"disabled":""}>
+       ${ownedBackgroundsS2().includes(b.id)?"購入済み":"購入する"}
+      </button>
+     </div>
+    `).join("")}
+   </div>
+  </div>
+ `;
+
+}
+
+window.s2Gacha=s2Gacha;
+window.s2ClaimLevels=claimLevelsS2;
+window.s2OpenEvent=openEventS2;
+window.s2BuyBackground=buyBackgroundS2;
+window.s2Refresh=renderS2;
+
+function initS2(){
+ registerAssetsS2();
+
+ let host=document.getElementById("season2Panel");
+ if(!host){
+  host=document.createElement("section");
+  host.id="season2Panel";
+
+  const shop=document.getElementById("shop");
+  const home=document.getElementById("home");
+  const target=shop||home||document.body;
+  target.appendChild(host);
+ }
+
+ renderS2();
+}
+
+if(document.readyState==="loading"){
+ document.addEventListener("DOMContentLoaded",initS2);
+}else{
+ initS2();
+}
+
+})();
+</script>
+<!-- ===== Season 2 END ===== -->
+
 </body>
 </html>
