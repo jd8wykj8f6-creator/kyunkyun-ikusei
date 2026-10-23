@@ -564,6 +564,26 @@ body.home-open .nav button.active{
 .gacha-result-card{padding:8px;border:1px solid #e9c4ea;border-radius:14px;background:#fffaff;font-size:12px;overflow-wrap:anywhere}
 .gacha-result-card img{width:100%;height:120px;object-fit:contain}
 .gacha-result-card small{display:block;color:#b24a9a;font-weight:bold}
+
+/* ガチャ演出・大きな着せ替えプレビュー */
+#dressPreview{margin:12px 0 20px;padding:14px;border-radius:22px;background:linear-gradient(155deg,#281435,#6e356d);color:#fff;position:relative;overflow:hidden}
+#dressPreview img{display:block;width:100%;height:min(65vh,520px);object-fit:contain;filter:drop-shadow(0 12px 15px #0006)}
+#dressPreview .dress-preview-name{font-weight:900;font-size:18px;margin:8px}
+#dressPreview .dress-preview-hint{font-size:12px;color:#ffe0f5}
+.gacha-overlay{position:fixed;inset:0;z-index:1000;background:#110a20ed;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px 14px calc(20px + env(safe-area-inset-bottom));color:white;text-align:center;overflow-y:auto}
+.gacha-overlay[hidden]{display:none!important}
+.gacha-summon{width:min(90vw,370px);min-height:330px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;animation:gachaEntrance .65s ease both}
+.gacha-summon .gacha-sigil{font-size:95px;line-height:1;filter:drop-shadow(0 0 26px #ff80dd);animation:gachaPulse 1s ease-in-out infinite alternate}
+.gacha-overlay.ssr{background:radial-gradient(circle,#8b56d8,#241039 70%)}
+.gacha-overlay.ssr .gacha-sigil{filter:drop-shadow(0 0 28px #fff) hue-rotate(90deg)}
+.gacha-reveal{width:min(92vw,420px);max-height:60vh;object-fit:contain;animation:gachaReveal .65s cubic-bezier(.2,1.5,.3,1) both;filter:drop-shadow(0 0 25px #ffb5f0)}
+.gacha-overlay.ssr .gacha-reveal{filter:drop-shadow(0 0 30px #f8dfff)}
+.gacha-overlay button{min-width:160px;min-height:52px;font-size:16px;margin-top:10px}
+.gacha-progress{font-size:14px;color:#ffe5fa}
+@keyframes gachaEntrance{from{opacity:0;transform:scale(.5) rotate(-12deg)}to{opacity:1;transform:scale(1) rotate(0)}}
+@keyframes gachaPulse{to{transform:scale(1.16) rotate(12deg)}}
+@keyframes gachaReveal{from{opacity:0;transform:scale(.2) rotate(-20deg)}to{opacity:1;transform:scale(1) rotate(0)}}
+@media(max-width:430px){#wardrobe{grid-template-columns:repeat(2,minmax(0,1fr))}#wardrobe .card button{width:100%;min-height:44px}#dressPreview img{height:min(58vh,440px)}}
 </style>
 </head>
 
@@ -802,7 +822,8 @@ body.home-open .nav button.active{
 
   <h3>👗 持っている衣装</h3>
 
-  <div class="grid" id="wardrobe"></div>
+  <div id="dressPreview" aria-live="polite"></div>
+   <div class="grid" id="wardrobe"></div>
 
  </div>
 
@@ -1027,6 +1048,8 @@ body.home-open .nav button.active{
  </button>
 
 </nav>
+
+<div id="gachaAnimation" class="gacha-overlay" hidden aria-live="polite"></div>
 
 <!-- 通知メッセージ -->
 <p id="giftmsg"></p>
@@ -2185,7 +2208,19 @@ function renderCharacterCards(){
 }
 
 /* ===== 所持衣装一覧 ===== */
+function renderDressPreview(){
+ const box=document.getElementById("dressPreview");
+ if(!box)return;
+ const item=outfits[cd().outfit]||outfits[active];
+ if(!item)return;
+ box.replaceChildren();
+ const img=document.createElement("img");img.src=item.src;img.alt=item.name;
+ const name=document.createElement("div");name.className="dress-preview-name";name.textContent=cd().name+" ♡ "+item.name;
+ const hint=document.createElement("div");hint.className="dress-preview-hint";hint.textContent="下の衣装から着替えると、ここに大きく表示されるよ♡";
+ box.append(img,name,hint);
+}
 function renderWardrobe(){
+ renderDressPreview();
  const box=document.getElementById("wardrobe");
  if(!box)return;
 
@@ -2284,6 +2319,39 @@ function renderGachaLineup(){
    1回引きは従来どおりチケットを優先使用
    10連はコインのみで一括購入
 ===================================== */
+let gachaPresentationId=0;
+function playGachaPresentation(results){
+ const overlay=document.getElementById("gachaAnimation");
+ if(!overlay)return;
+ const token=++gachaPresentationId;
+ overlay.hidden=false;
+ let index=0;
+ function reveal(){
+  if(token!==gachaPresentationId)return;
+  overlay.replaceChildren();
+  const {item,duplicate}=results[index];
+  overlay.classList.toggle("ssr",item.rarity==="SSR");
+  const progress=document.createElement("div");progress.className="gacha-progress";progress.textContent=(index+1)+" / "+results.length;
+  const img=document.createElement("img");img.className="gacha-reveal";img.src=item.src;img.alt=item.name;
+  const title=document.createElement("h2");title.textContent=(item.rarity==="SSR"?"🌈 SSR!! ":"✨ ")+item.name;
+  const status=document.createElement("div");status.textContent=duplicate?"重複 +20コイン":"🎉 NEW!";
+  const next=document.createElement("button");next.textContent=index===results.length-1?"結果一覧を見る":"次の衣装へ →";
+  next.onclick=()=>{index++;if(index>=results.length){close();document.getElementById("gachaEffect")?.scrollIntoView({behavior:"smooth",block:"center"});}else{summon();}};
+  overlay.append(progress,img,title,status,next);
+ }
+ function summon(){
+  if(token!==gachaPresentationId)return;
+  overlay.classList.remove("ssr");overlay.replaceChildren();
+  const box=document.createElement("div");box.className="gacha-summon";
+  const icon=document.createElement("div");icon.className="gacha-sigil";icon.textContent="💎";
+  const title=document.createElement("h2");title.textContent=results.length===10?"✨ 10連ガチャ ✨":"💗 衣装召喚 💗";
+  const info=document.createElement("p");info.textContent="キラキラの光から衣装が現れる…！";
+  box.append(icon,title,info);overlay.append(box);
+  setTimeout(()=>{if(token===gachaPresentationId && !overlay.hidden)reveal();},850);
+ }
+ function close(){overlay.hidden=true;overlay.replaceChildren();overlay.classList.remove("ssr");}
+ summon();
+}
 function gacha(count=1){
  count=count===10?10:1;
  const useTicket=count===1 && s2.tickets>0;
@@ -2353,6 +2421,7 @@ function gacha(count=1){
  renderWardrobe();
  renderGachaHistory();
  renderGachaLineup();
+ playGachaPresentation(results);
  renderSeason2Rewards();
  renderMissions();
  renderAchievements();
