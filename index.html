@@ -3539,5 +3539,1605 @@ function startGame(){
 startGame();
 
 </script>
+ 
+<!-- =====================================
+     Season 3 RPG パート1 / 4
+     RPG画面とデザイン
+===================================== -->
+
+<style>
+/* ===== RPG入口ボタン ===== */
+#rpgOpenButton{
+ position:fixed;
+ right:15px;
+ bottom:82px;
+ z-index:900;
+ border:2px solid #fff;
+ border-radius:999px;
+ padding:12px 17px;
+ background:linear-gradient(135deg,#753cff,#ff4f9c);
+ color:white;
+ font-weight:bold;
+ box-shadow:0 5px 20px #0007;
+ cursor:pointer;
+}
+
+/* ===== RPG全画面 ===== */
+#rpgScreen{
+ display:none;
+ position:fixed;
+ inset:0;
+ z-index:3000;
+ overflow-y:auto;
+ background:linear-gradient(
+  160deg,
+  #101429,
+  #232044 55%,
+  #381e45
+ );
+ color:white;
+ padding:16px;
+ padding-bottom:45px;
+ box-sizing:border-box;
+ font-family:inherit;
+}
+
+#rpgScreen.rpg-visible{
+ display:block;
+}
+
+#rpgScreen *{
+ box-sizing:border-box;
+}
+
+.rpg-top{
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ gap:10px;
+ margin-bottom:16px;
+}
+
+.rpg-title{
+ font-size:22px;
+ font-weight:900;
+ color:#ffc0e4;
+}
+
+.rpg-close{
+ background:#39334f;
+ color:white;
+ border:1px solid #777;
+ border-radius:12px;
+ padding:10px 15px;
+ cursor:pointer;
+}
+
+.rpg-panel{
+ background:#ffffff12;
+ border:1px solid #ffffff24;
+ border-radius:17px;
+ padding:15px;
+ margin:12px 0;
+ box-shadow:0 6px 22px #0002;
+}
+
+.rpg-heading{
+ font-size:19px;
+ font-weight:bold;
+ margin-bottom:12px;
+ color:#ffb8e1;
+}
+
+.rpg-button{
+ background:linear-gradient(135deg,#7944e8,#ed5eaf);
+ border:0;
+ color:white;
+ padding:12px 15px;
+ border-radius:12px;
+ font-size:14px;
+ font-weight:bold;
+ cursor:pointer;
+ margin:4px;
+}
+
+.rpg-button:disabled{
+ opacity:.45;
+ cursor:not-allowed;
+}
+
+.rpg-button.secondary{
+ background:#45415e;
+}
+
+.rpg-stage{
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ gap:10px;
+ padding:14px;
+ border:1px solid #ffffff30;
+ border-radius:12px;
+ margin-bottom:10px;
+ background:#ffffff0a;
+}
+
+.rpg-stage.locked{
+ opacity:.55;
+}
+
+.rpg-small{
+ font-size:12px;
+ color:#c9c5df;
+}
+
+.rpg-party{
+ display:grid;
+ grid-template-columns:repeat(3,minmax(0,1fr));
+ gap:8px;
+}
+
+.rpg-member{
+ background:#ffffff10;
+ border:1px solid #ffffff25;
+ border-radius:12px;
+ padding:10px 6px;
+ text-align:center;
+ min-width:0;
+}
+
+.rpg-member img{
+ width:100%;
+ height:100px;
+ object-fit:contain;
+}
+
+.rpg-hp-track{
+ height:9px;
+ background:#343044;
+ border-radius:99px;
+ overflow:hidden;
+ margin-top:6px;
+}
+
+.rpg-hp-fill{
+ height:100%;
+ background:linear-gradient(90deg,#53d69b,#a1ffd3);
+ transition:width .2s;
+}
+
+.rpg-enemy{
+ text-align:center;
+ padding:15px 0;
+}
+
+.rpg-enemy-icon{
+ font-size:74px;
+ filter:drop-shadow(0 0 15px #b56aff);
+}
+
+.rpg-log{
+ min-height:70px;
+ max-height:150px;
+ overflow-y:auto;
+ background:#0d1022;
+ border-radius:12px;
+ padding:12px;
+ font-size:13px;
+ line-height:1.7;
+ margin:12px 0;
+}
+
+.rpg-command-grid{
+ display:grid;
+ grid-template-columns:repeat(2,minmax(0,1fr));
+ gap:8px;
+}
+
+.rpg-command-grid button{
+ width:100%;
+ margin:0;
+}
+
+.rpg-selected{
+ border:2px solid #ffb7e1;
+ box-shadow:0 0 12px #ff7aca66;
+}
+
+#rpgScreen h2,
+#rpgScreen h3,
+#rpgScreen p{
+ color:inherit;
+}
+
+#rpgBattleArea{
+ display:none;
+}
+
+#rpgBattleArea.rpg-active{
+ display:block;
+}
+
+#rpgMapArea.rpg-hidden{
+ display:none;
+}
+
+@media(max-width:380px){
+ .rpg-title{font-size:18px}
+ .rpg-button{padding:10px 8px;font-size:12px}
+ .rpg-member img{height:78px}
+}
+</style>
+
+<!-- RPG入口 -->
+<button id="rpgOpenButton"
+ type="button"
+ onclick="rpgOpen()">
+ ⚔️ 冒険
+</button>
+
+<!-- RPG画面 -->
+<div id="rpgScreen">
+
+ <div class="rpg-top">
+  <div class="rpg-title">
+   ⚔️ きゅんきゅん♡クロニクル
+  </div>
+
+  <button class="rpg-close"
+   type="button"
+   onclick="rpgClose()">
+   ✕ 戻る
+  </button>
+ </div>
+
+ <!-- 冒険マップ -->
+ <div id="rpgMapArea">
+
+  <div class="rpg-panel">
+   <div class="rpg-heading">
+    🌸 第1章 ハートの森
+   </div>
+
+   <p class="rpg-small">
+    3人の力を合わせて、
+    森の魔物を倒そう！
+   </p>
+
+   <div id="rpgStageList"></div>
+  </div>
+
+  <div class="rpg-panel">
+   <div class="rpg-heading">
+    💗 冒険パーティー
+   </div>
+
+   <div id="rpgPartyPreview"
+    class="rpg-party"></div>
+  </div>
+
+  <div class="rpg-panel">
+   <div class="rpg-heading">
+    🎒 冒険の記録
+   </div>
+
+   <div id="rpgStatus"></div>
+  </div>
+
+ </div>
+
+ <!-- バトル画面 -->
+ <div id="rpgBattleArea">
+
+  <div class="rpg-panel">
+
+   <div id="rpgStageTitle"
+    class="rpg-heading">
+    STAGE 1
+   </div>
+
+   <div class="rpg-enemy">
+
+    <div id="rpgEnemyIcon"
+     class="rpg-enemy-icon">
+     👾
+    </div>
+
+    <h3 id="rpgEnemyName">
+     モンスター
+    </h3>
+
+    <div id="rpgEnemyHPText"></div>
+
+    <div class="rpg-hp-track">
+     <div id="rpgEnemyHPBar"
+      class="rpg-hp-fill"
+      style="width:100%;background:#ff648f">
+     </div>
+    </div>
+
+   </div>
+
+   <div id="rpgBattleParty"
+    class="rpg-party"></div>
+
+   <div id="rpgTurnInfo"
+    class="rpg-small"></div>
+
+   <div id="rpgBattleLog"
+    class="rpg-log"></div>
+
+   <div id="rpgCommands"
+    class="rpg-command-grid"></div>
+
+   <div id="rpgBattleResult"></div>
+
+  </div>
+
+  <button class="rpg-button secondary"
+   type="button"
+   onclick="rpgRetreat()">
+   🏠 冒険マップへ
+  </button>
+
+ </div>
+
+</div>
+
+<!-- Season 3 パート1ここまで -->
+
+<!-- =====================================
+     Season 3 RPG パート2 / 4
+     キャラ・敵・セーブデータ
+===================================== -->
+
+<script>
+"use strict";
+
+/* ===== RPG基本設定 ===== */
+
+const RPG_SAVE_KEY = "kyunkyunRPG";
+
+const RPG_VERSION = 1;
+
+/* ===== キャラクター設定 ===== */
+
+const RPG_CHARACTERS = {
+ momo: {
+  id: "momo",
+  name: "もも",
+  icon: "🖤",
+  role: "闇のアタッカー",
+  element: "dark",
+  baseHP: 120,
+  baseATK: 24,
+  baseDEF: 9,
+  baseSPD: 12,
+  skillName: "ダークローズ",
+  skillCost: 15,
+  image: "./DC60C809-3450-44F0-AD54-6BFAE6ADF245.png"
+ },
+
+ mei: {
+  id: "mei",
+  name: "めい",
+  icon: "💗",
+  role: "光のヒーラー",
+  element: "light",
+  baseHP: 100,
+  baseATK: 13,
+  baseDEF: 12,
+  baseSPD: 14,
+  skillName: "ハートヒール",
+  skillCost: 15,
+  image: "./無題146_20261023052427.png"
+ },
+
+ rei: {
+  id: "rei",
+  name: "レイ",
+  icon: "💙",
+  role: "雷のテクニカル",
+  element: "thunder",
+  baseHP: 110,
+  baseATK: 19,
+  baseDEF: 10,
+  baseSPD: 18,
+  skillName: "プラズマショット",
+  skillCost: 15,
+  image: "./無題146_20261023052455.png"
+ }
+};
+
+/* ===== 第1章の敵 ===== */
+
+const RPG_ENEMIES = [
+ {
+  id: "slime",
+  name: "ハートスライム",
+  icon: "💗",
+  maxHP: 70,
+  atk: 11,
+  def: 3,
+  exp: 15,
+  coins: 20
+ },
+ {
+  id: "bat",
+  name: "ナイトバット",
+  icon: "🦇",
+  maxHP: 105,
+  atk: 15,
+  def: 5,
+  exp: 25,
+  coins: 35
+ },
+ {
+  id: "wolf",
+  name: "ローズウルフ",
+  icon: "🐺",
+  maxHP: 145,
+  atk: 19,
+  def: 7,
+  exp: 40,
+  coins: 50
+ },
+ {
+  id: "spirit",
+  name: "迷いの精霊",
+  icon: "👻",
+  maxHP: 185,
+  atk: 22,
+  def: 9,
+  exp: 60,
+  coins: 75
+ },
+ {
+  id: "boss",
+  name: "スライムキング",
+  icon: "👑",
+  maxHP: 280,
+  atk: 27,
+  def: 12,
+  exp: 120,
+  coins: 150
+ }
+];
+
+/* ===== 初期セーブデータ ===== */
+
+function rpgDefaultSave() {
+ return {
+  version: RPG_VERSION,
+  unlockedStage: 1,
+  clearedStages: [],
+  totalWins: 0,
+  totalLosses: 0,
+  characters: {
+   momo: {
+    level: 1,
+    exp: 0
+   },
+   mei: {
+    level: 1,
+    exp: 0
+   },
+   rei: {
+    level: 1,
+    exp: 0
+   }
+  }
+ };
+}
+
+/* ===== セーブデータ読み込み ===== */
+
+function rpgLoadSave() {
+ const defaults = rpgDefaultSave();
+
+ try {
+  const raw = localStorage.getItem(
+   RPG_SAVE_KEY
+  );
+
+  if (!raw) {
+   return defaults;
+  }
+
+  const saved = JSON.parse(raw);
+
+  if (
+   !saved ||
+   typeof saved !== "object" ||
+   Array.isArray(saved)
+  ) {
+   return defaults;
+  }
+
+  const result = {
+   ...defaults,
+   ...saved,
+   characters: {
+    ...defaults.characters
+   }
+  };
+
+  for (const id of ["momo", "mei", "rei"]) {
+   const old = saved.characters?.[id];
+
+   const level = Number(old?.level);
+   const exp = Number(old?.exp);
+
+   result.characters[id] = {
+    level:
+     Number.isSafeInteger(level) &&
+     level >= 1
+      ? Math.min(level, 999)
+      : 1,
+
+    exp:
+     Number.isSafeInteger(exp) &&
+     exp >= 0
+      ? Math.min(exp, 100000000)
+      : 0
+   };
+  }
+
+  result.unlockedStage =
+   Number.isSafeInteger(saved.unlockedStage)
+    ? Math.max(
+       1,
+       Math.min(5, saved.unlockedStage)
+      )
+    : 1;
+
+  result.clearedStages =
+   Array.isArray(saved.clearedStages)
+    ? [
+       ...new Set(
+        saved.clearedStages.filter(
+         n =>
+          Number.isInteger(n) &&
+          n >= 1 &&
+          n <= 5
+        )
+       )
+      ]
+    : [];
+
+  result.totalWins =
+   Number.isSafeInteger(saved.totalWins) &&
+   saved.totalWins >= 0
+    ? saved.totalWins
+    : 0;
+
+  result.totalLosses =
+   Number.isSafeInteger(saved.totalLosses) &&
+   saved.totalLosses >= 0
+    ? saved.totalLosses
+    : 0;
+
+  return result;
+
+ } catch (error) {
+  console.warn(
+   "RPGセーブの読み込みに失敗:",
+   error
+  );
+
+  return defaults;
+ }
+}
+
+/* ===== RPGの現在データ ===== */
+
+let rpgSave = rpgLoadSave();
+
+/* ===== RPG専用保存 ===== */
+
+function rpgSaveGame() {
+ try {
+  localStorage.setItem(
+   RPG_SAVE_KEY,
+   JSON.stringify(rpgSave)
+  );
+
+  return true;
+
+ } catch (error) {
+  console.error(
+   "RPGセーブに失敗:",
+   error
+  );
+
+  return false;
+ }
+}
+
+/* ===== 経験値計算 ===== */
+
+function rpgRequiredExp(level) {
+ return 30 + level * 20;
+}
+
+/* ===== ステータス計算 ===== */
+
+function rpgGetStats(id) {
+ const base = RPG_CHARACTERS[id];
+ const saved = rpgSave.characters[id];
+
+ if (!base || !saved) {
+  return null;
+ }
+
+ const lv = saved.level;
+
+ return {
+  id,
+  name: base.name,
+  icon: base.icon,
+  role: base.role,
+  image: base.image,
+  level: lv,
+  maxHP: base.baseHP + (lv - 1) * 12,
+  atk: base.baseATK + (lv - 1) * 3,
+  def: base.baseDEF + (lv - 1) * 2,
+  spd: base.baseSPD + (lv - 1),
+  skillName: base.skillName,
+  skillCost: base.skillCost,
+  exp: saved.exp,
+  nextExp: rpgRequiredExp(lv)
+ };
+}
+
+/* ===== 経験値獲得 ===== */
+
+function rpgGainExp(id, amount) {
+ const character = rpgSave.characters[id];
+
+ if (!character) {
+  return [];
+ }
+
+ const levelUps = [];
+
+ character.exp += Math.max(
+  0,
+  Math.floor(amount)
+ );
+
+ while (
+  character.level < 999 &&
+  character.exp >=
+   rpgRequiredExp(character.level)
+ ) {
+  character.exp -=
+   rpgRequiredExp(character.level);
+
+  character.level++;
+
+  levelUps.push(character.level);
+ }
+
+ if (character.level >= 999) {
+  character.exp = 0;
+ }
+
+ return levelUps;
+}
+
+/* ===== 敵データ取得 ===== */
+
+function rpgGetEnemy(stage) {
+ const index = Math.max(
+  0,
+  Math.min(
+   RPG_ENEMIES.length - 1,
+   Math.floor(stage) - 1
+  )
+ );
+
+ const enemy = RPG_ENEMIES[index];
+
+ return {
+  ...enemy,
+  hp: enemy.maxHP
+ };
+}
+
+/* ===== バトル中の一時データ ===== */
+
+let rpgBattle = null;
+
+/* ===== 安全な表示用文字変換 ===== */
+
+function rpgEscapeHTML(value) {
+ return String(value).replace(
+  /[&<>"']/g,
+  char => ({
+   "&": "&amp;",
+   "<": "&lt;",
+   ">": "&gt;",
+   '"': "&quot;",
+   "'": "&#39;"
+  })[char]
+ );
+}
+
+/* ===== パート2ここまで ===== */
+</script>
+
+<!-- =====================================
+ Season 3 RPG パート3 / 4
+ コマンドバトル・報酬処理
+===================================== -->
+<script>
+"use strict";
+
+/* ===== バトル開始 ===== */
+
+function rpgStartBattle(stage) {
+ stage = Number(stage);
+
+ if (
+  !Number.isInteger(stage) ||
+  stage < 1 ||
+  stage > 5 ||
+  stage > rpgSave.unlockedStage
+ ) {
+  return;
+ }
+
+ const enemy = rpgGetEnemy(stage);
+
+ rpgBattle = {
+  stage,
+  enemy,
+  turn: 1,
+  actorIndex: 0,
+  sp: 40,
+  maxSP: 60,
+  bond: 0,
+  guarding: {},
+  finished: false,
+  party: ["momo", "mei", "rei"].map(id => {
+   const stats = rpgGetStats(id);
+   return {
+    ...stats,
+    hp: stats.maxHP
+   };
+  }),
+  logs: [
+   `${enemy.name}が現れた！`
+  ]
+ };
+
+ document.getElementById(
+  "rpgMapArea"
+ ).classList.add("rpg-hidden");
+
+ document.getElementById(
+  "rpgBattleArea"
+ ).classList.add("rpg-active");
+
+ rpgRenderBattle();
+}
+
+/* ===== 現在行動するキャラ ===== */
+
+function rpgCurrentActor() {
+ if (!rpgBattle) return null;
+
+ return rpgBattle.party[
+  rpgBattle.actorIndex
+ ];
+}
+
+/* ===== 戦闘ログ ===== */
+
+function rpgAddLog(message) {
+ if (!rpgBattle) return;
+
+ rpgBattle.logs.push(message);
+
+ if (rpgBattle.logs.length > 20) {
+  rpgBattle.logs.shift();
+ }
+}
+
+/* ===== ダメージ計算 ===== */
+
+function rpgDamage(atk, def, multiplier = 1) {
+ const base = Math.max(
+  1,
+  atk * multiplier - def * 0.5
+ );
+
+ const random = 0.9 + Math.random() * 0.2;
+
+ return Math.max(
+  1,
+  Math.floor(base * random)
+ );
+}
+
+/* ===== プレイヤーの行動 ===== */
+
+function rpgCommand(command) {
+ const battle = rpgBattle;
+
+ if (!battle || battle.finished) return;
+
+ const actor = rpgCurrentActor();
+
+ if (!actor || actor.hp <= 0) return;
+
+ if (command === "attack") {
+  const damage = rpgDamage(
+   actor.atk,
+   battle.enemy.def
+  );
+
+  battle.enemy.hp = Math.max(
+   0,
+   battle.enemy.hp - damage
+  );
+
+  battle.sp = Math.min(
+   battle.maxSP,
+   battle.sp + 5
+  );
+
+  battle.bond = Math.min(
+   100,
+   battle.bond + 12
+  );
+
+  rpgAddLog(
+   `${actor.name}の攻撃！ ${damage}ダメージ！`
+  );
+
+ } else if (command === "skill") {
+
+  if (battle.sp < 15) {
+   rpgAddLog("SPが足りない！");
+   rpgRenderBattle();
+   return;
+  }
+
+  battle.sp -= 15;
+
+  if (actor.id === "mei") {
+
+   const target = battle.party
+    .filter(c => c.hp > 0)
+    .sort(
+     (a, b) =>
+      a.hp / a.maxHP -
+      b.hp / b.maxHP
+    )[0];
+
+   if (target) {
+    const heal = 35 + actor.level * 5;
+
+    const recovered = Math.min(
+     heal,
+     target.maxHP - target.hp
+    );
+
+    target.hp += recovered;
+
+    rpgAddLog(
+     `めいのハートヒール！ ` +
+     `${target.name}のHPを${recovered}回復！`
+    );
+   }
+
+  } else {
+
+   const multiplier =
+    actor.id === "momo" ? 1.9 : 1.6;
+
+   const damage = rpgDamage(
+    actor.atk,
+    battle.enemy.def,
+    multiplier
+   );
+
+   battle.enemy.hp = Math.max(
+    0,
+    battle.enemy.hp - damage
+   );
+
+   rpgAddLog(
+    `${actor.name}の${actor.skillName}！ ` +
+    `${damage}ダメージ！`
+   );
+
+   if (
+    actor.id === "rei" &&
+    Math.random() < 0.3
+   ) {
+    battle.enemyStunned = true;
+    rpgAddLog("敵がスタンした！");
+   }
+  }
+
+  battle.bond = Math.min(
+   100,
+   battle.bond + 18
+  );
+
+ } else if (command === "guard") {
+
+  battle.guarding[actor.id] = true;
+
+  battle.sp = Math.min(
+   battle.maxSP,
+   battle.sp + 10
+  );
+
+  rpgAddLog(
+   `${actor.name}は防御の構え！`
+  );
+
+ } else if (command === "bond") {
+
+  if (battle.bond < 100) {
+   rpgAddLog(
+    "絆ゲージが足りない！"
+   );
+   rpgRenderBattle();
+   return;
+  }
+
+  battle.bond = 0;
+
+  const damage =
+   battle.party.reduce(
+    (sum, c) =>
+     sum + (c.hp > 0 ? c.atk : 0),
+    0
+   ) * 2;
+
+  battle.enemy.hp = Math.max(
+   0,
+   battle.enemy.hp - damage
+  );
+
+  rpgAddLog(
+   `💖 3人の連携必殺技！ ` +
+   `${damage}ダメージ！`
+  );
+
+ } else {
+  return;
+ }
+
+ if (battle.enemy.hp <= 0) {
+  rpgWinBattle();
+  return;
+ }
+
+ rpgNextActor();
+}
+
+/* ===== 次のキャラへ ===== */
+
+function rpgNextActor() {
+ const battle = rpgBattle;
+
+ if (!battle || battle.finished) return;
+
+ let next = battle.actorIndex + 1;
+
+ while (
+  next < battle.party.length &&
+  battle.party[next].hp <= 0
+ ) {
+  next++;
+ }
+
+ if (next < battle.party.length) {
+  battle.actorIndex = next;
+  rpgRenderBattle();
+  return;
+ }
+
+ rpgEnemyTurn();
+}
+
+/* ===== 敵の反撃 ===== */
+
+function rpgEnemyTurn() {
+ const battle = rpgBattle;
+
+ if (!battle || battle.finished) return;
+
+ if (battle.enemyStunned) {
+  battle.enemyStunned = false;
+
+  rpgAddLog(
+   `${battle.enemy.name}は動けない！`
+  );
+
+ } else {
+
+  const alive = battle.party.filter(
+   c => c.hp > 0
+  );
+
+  if (alive.length === 0) {
+   rpgLoseBattle();
+   return;
+  }
+
+  const target = alive[
+   Math.floor(Math.random() * alive.length)
+  ];
+
+  let damage = rpgDamage(
+   battle.enemy.atk,
+   target.def
+  );
+
+  if (battle.guarding[target.id]) {
+   damage = Math.max(
+    1,
+    Math.floor(damage * 0.4)
+   );
+  }
+
+  target.hp = Math.max(
+   0,
+   target.hp - damage
+  );
+
+  rpgAddLog(
+   `${battle.enemy.name}の攻撃！ ` +
+   `${target.name}に${damage}ダメージ！`
+  );
+
+  if (target.hp === 0) {
+   rpgAddLog(
+    `${target.name}は戦闘不能！`
+   );
+  }
+ }
+
+ battle.guarding = {};
+
+ if (
+  battle.party.every(c => c.hp <= 0)
+ ) {
+  rpgLoseBattle();
+  return;
+ }
+
+ battle.turn++;
+
+ battle.actorIndex =
+  battle.party.findIndex(
+   c => c.hp > 0
+  );
+
+ rpgRenderBattle();
+}
+
+/* ===== 勝利処理 ===== */
+
+function rpgWinBattle() {
+ const battle = rpgBattle;
+
+ if (!battle || battle.finished) return;
+
+ battle.finished = true;
+
+ const stage = battle.stage;
+ const enemy = battle.enemy;
+
+ rpgSave.totalWins++;
+
+ if (!rpgSave.clearedStages.includes(stage)) {
+  rpgSave.clearedStages.push(stage);
+ }
+
+ rpgSave.unlockedStage = Math.max(
+  rpgSave.unlockedStage,
+  Math.min(5, stage + 1)
+ );
+
+ const levelUpMessages = [];
+
+ for (const id of ["momo", "mei", "rei"]) {
+  const ups = rpgGainExp(id, enemy.exp);
+
+  if (ups.length > 0) {
+   levelUpMessages.push(
+    `${RPG_CHARACTERS[id].name} Lv.${ups.at(-1)}！`
+   );
+  }
+ }
+
+ const saved = rpgSaveGame();
+
+ rpgAddLog(
+  `🎉 勝利！ 経験値${enemy.exp}獲得！`
+ );
+
+ if (levelUpMessages.length) {
+  rpgAddLog(
+   "⭐ " + levelUpMessages.join(" / ")
+  );
+ }
+
+ if (!saved) {
+  rpgAddLog(
+   "⚠️ RPGの保存に失敗しました"
+  );
+ }
+
+ /*
+  コイン連携について
+
+  既存ゲームのコイン管理方法は
+  index.htmlの実物を確認していないため、
+  ここでは勝手に書き換えません。
+
+  パート4で安全な報酬処理を接続します。
+ */
+
+ rpgAddLog(
+  `🪙 コイン報酬：${enemy.coins}枚`
+ );
+
+ rpgRenderBattle();
+}
+
+/* ===== 敗北処理 ===== */
+
+function rpgLoseBattle() {
+ const battle = rpgBattle;
+
+ if (!battle || battle.finished) return;
+
+ battle.finished = true;
+
+ rpgSave.totalLosses++;
+ rpgSaveGame();
+
+ rpgAddLog(
+  "💔 全員が戦闘不能！ 敗北……"
+ );
+
+ rpgRenderBattle();
+}
+
+/* ===== バトル表示 ===== */
+
+function rpgRenderBattle() {
+ const battle = rpgBattle;
+
+ if (!battle) return;
+
+ const enemy = battle.enemy;
+
+ document.getElementById(
+  "rpgStageTitle"
+ ).textContent =
+  `STAGE ${battle.stage} / TURN ${battle.turn}`;
+
+ document.getElementById(
+  "rpgEnemyIcon"
+ ).textContent = enemy.icon;
+
+ document.getElementById(
+  "rpgEnemyName"
+ ).textContent = enemy.name;
+
+ document.getElementById(
+  "rpgEnemyHPText"
+ ).textContent =
+  `HP ${enemy.hp} / ${enemy.maxHP}`;
+
+ document.getElementById(
+  "rpgEnemyHPBar"
+ ).style.width =
+  `${enemy.hp / enemy.maxHP * 100}%`;
+
+ const current = rpgCurrentActor();
+
+ document.getElementById(
+  "rpgBattleParty"
+ ).innerHTML = battle.party.map(c => {
+
+  const percent =
+   Math.max(0, c.hp / c.maxHP * 100);
+
+  const selected =
+   !battle.finished &&
+   current?.id === c.id
+    ? "rpg-selected"
+    : "";
+
+  return `
+   <div class="rpg-member ${selected}">
+    <img src="${rpgEscapeHTML(c.image)}"
+     alt="${rpgEscapeHTML(c.name)}">
+    <b>${rpgEscapeHTML(c.name)}</b>
+    <div class="rpg-small">Lv.${c.level}</div>
+    <div class="rpg-small">
+     HP ${c.hp}/${c.maxHP}
+    </div>
+    <div class="rpg-hp-track">
+     <div class="rpg-hp-fill"
+      style="width:${percent}%">
+     </div>
+    </div>
+   </div>
+  `;
+ }).join("");
+
+ document.getElementById(
+  "rpgTurnInfo"
+ ).textContent =
+  `SP ${battle.sp}/${battle.maxSP}` +
+  ` ｜ 絆 ${battle.bond}%`;
+
+ document.getElementById(
+  "rpgBattleLog"
+ ).innerHTML = battle.logs.map(
+  line => `<div>${rpgEscapeHTML(line)}</div>`
+ ).join("");
+
+ const commands = document.getElementById(
+  "rpgCommands"
+ );
+
+ if (battle.finished) {
+  commands.innerHTML = "";
+
+  document.getElementById(
+   "rpgBattleResult"
+  ).innerHTML = `
+   <button class="rpg-button"
+    type="button"
+    onclick="rpgRetreat()">
+    🗺️ マップに戻る
+   </button>
+  `;
+
+  return;
+ }
+
+ document.getElementById(
+  "rpgBattleResult"
+ ).innerHTML = "";
+
+ commands.innerHTML = `
+  <button class="rpg-button"
+   type="button"
+   onclick="rpgCommand('attack')">
+   ⚔️ 攻撃
+  </button>
+
+  <button class="rpg-button"
+   type="button"
+   ${battle.sp < 15 ? "disabled" : ""}
+   onclick="rpgCommand('skill')">
+   ✨ スキル -15SP
+  </button>
+
+  <button class="rpg-button"
+   type="button"
+   onclick="rpgCommand('guard')">
+   🛡️ 防御
+  </button>
+
+  <button class="rpg-button"
+   type="button"
+   ${battle.bond < 100 ? "disabled" : ""}
+   onclick="rpgCommand('bond')">
+   💖 連携必殺技
+  </button>
+ `;
+}
+
+/* ===== パート3ここまで ===== */
+</script>
+
+<!-- =====================================
+ Season 3 RPG パート4 / 4
+ 冒険マップ・画面切替・起動処理
+===================================== -->
+<script>
+"use strict";
+
+/* ===== 冒険画面を開く ===== */
+
+function rpgOpen() {
+ const screen = document.getElementById(
+  "rpgScreen"
+ );
+
+ if (!screen) return;
+
+ // 戦闘中なら戦闘画面を維持
+ if (!rpgBattle || rpgBattle.finished) {
+  rpgShowMap();
+ }
+
+ screen.classList.add("rpg-visible");
+
+ document.body.style.overflow = "hidden";
+}
+
+/* ===== 冒険画面を閉じる ===== */
+
+function rpgClose() {
+ const screen = document.getElementById(
+  "rpgScreen"
+ );
+
+ if (!screen) return;
+
+ screen.classList.remove("rpg-visible");
+
+ document.body.style.overflow = "";
+
+ // 戦闘中はデータを保持
+ // もう一度開けば続きから遊べる
+}
+
+/* ===== 冒険マップへ戻る ===== */
+
+function rpgRetreat() {
+ if (
+  rpgBattle &&
+  !rpgBattle.finished
+ ) {
+  const ok = confirm(
+   "戦闘を中断してマップに戻りますか？\n" +
+   "この戦闘の報酬は獲得できません。"
+  );
+
+  if (!ok) return;
+ }
+
+ rpgBattle = null;
+
+ rpgShowMap();
+}
+
+/* ===== マップ表示 ===== */
+
+function rpgShowMap() {
+ const map = document.getElementById(
+  "rpgMapArea"
+ );
+
+ const battle = document.getElementById(
+  "rpgBattleArea"
+ );
+
+ if (!map || !battle) return;
+
+ map.classList.remove("rpg-hidden");
+ battle.classList.remove("rpg-active");
+
+ rpgRenderStages();
+ rpgRenderPartyPreview();
+ rpgRenderStatus();
+}
+
+/* ===== ステージ一覧 ===== */
+
+function rpgRenderStages() {
+ const container = document.getElementById(
+  "rpgStageList"
+ );
+
+ if (!container) return;
+
+ const stageNames = [
+  "はじまりの草原",
+  "夜の花畑",
+  "黒薔薇の小道",
+  "精霊の泉",
+  "森の王との決戦"
+ ];
+
+ let html = "";
+
+ for (let i = 1; i <= 5; i++) {
+  const enemy = rpgGetEnemy(i);
+
+  const unlocked =
+   i <= rpgSave.unlockedStage;
+
+  const cleared =
+   rpgSave.clearedStages.includes(i);
+
+  html += `
+   <div class="rpg-stage ${unlocked ? "" : "locked"}">
+    <div>
+     <b>
+      ${cleared ? "✅" : unlocked ? "⚔️" : "🔒"}
+      STAGE ${i}
+     </b>
+
+     <div class="rpg-small">
+      ${rpgEscapeHTML(stageNames[i - 1])}
+     </div>
+
+     <div class="rpg-small">
+      ${unlocked
+       ? rpgEscapeHTML(enemy.name)
+       : "未解放"}
+     </div>
+    </div>
+
+    <button
+     class="rpg-button"
+     type="button"
+     ${unlocked ? "" : "disabled"}
+     onclick="rpgStartBattle(${i})">
+     ${cleared ? "再挑戦" : unlocked ? "挑戦" : "🔒"}
+    </button>
+   </div>
+  `;
+ }
+
+ container.innerHTML = html;
+}
+
+/* ===== パーティー表示 ===== */
+
+function rpgRenderPartyPreview() {
+ const container = document.getElementById(
+  "rpgPartyPreview"
+ );
+
+ if (!container) return;
+
+ container.innerHTML = [
+  "momo",
+  "mei",
+  "rei"
+ ].map(id => {
+
+  const stats = rpgGetStats(id);
+
+  if (!stats) return "";
+
+  const expPercent = Math.min(
+   100,
+   stats.exp / stats.nextExp * 100
+  );
+
+  return `
+   <div class="rpg-member">
+    <img
+     src="${rpgEscapeHTML(stats.image)}"
+     alt="${rpgEscapeHTML(stats.name)}">
+
+    <b>${rpgEscapeHTML(stats.name)}</b>
+
+    <div class="rpg-small">
+     ${rpgEscapeHTML(stats.role)}
+    </div>
+
+    <div class="rpg-small">
+     ⚔️ Lv.${stats.level}
+    </div>
+
+    <div class="rpg-small">
+     HP ${stats.maxHP}
+    </div>
+
+    <div class="rpg-small">
+     ATK ${stats.atk} / DEF ${stats.def}
+    </div>
+
+    <div class="rpg-hp-track">
+     <div
+      class="rpg-hp-fill"
+      style="
+       width:${expPercent}%;
+       background:#9a7aff;
+      ">
+     </div>
+    </div>
+
+    <div class="rpg-small">
+     EXP ${stats.exp}/${stats.nextExp}
+    </div>
+   </div>
+  `;
+ }).join("");
+}
+
+/* ===== 冒険の記録 ===== */
+
+function rpgRenderStatus() {
+ const container = document.getElementById(
+  "rpgStatus"
+ );
+
+ if (!container) return;
+
+ const cleared =
+  rpgSave.clearedStages.length;
+
+ const allClear = cleared >= 5;
+
+ container.innerHTML = `
+  <div style="line-height:2">
+   🌸 クリア済み：${cleared} / 5<br>
+   🏆 勝利回数：${rpgSave.totalWins}<br>
+   💔 敗北回数：${rpgSave.totalLosses}<br>
+   🔓 解放ステージ：
+   ${rpgSave.unlockedStage} / 5
+  </div>
+
+  ${allClear ? `
+   <div style="
+    margin-top:12px;
+    padding:12px;
+    border-radius:12px;
+    background:#ff77bd22;
+    color:#ffc5e5;
+    text-align:center;
+    font-weight:bold;
+   ">
+    👑 第1章 ハートの森 COMPLETE！
+    <br>
+    3人の絆が森を救った！
+   </div>
+  ` : ""}
+ `;
+}
+
+/* ===== 初期化 ===== */
+
+function rpgInitialize() {
+ const button = document.getElementById(
+  "rpgOpenButton"
+ );
+
+ const screen = document.getElementById(
+  "rpgScreen"
+ );
+
+ if (!button || !screen) {
+  console.warn(
+   "Season 3 RPGの画面が見つかりません"
+  );
+  return;
+ }
+
+ // RPGの初期表示
+ rpgShowMap();
+
+ console.log(
+  "⚔️ Season 3 RPG 起動成功！"
+ );
+}
+
+/* ===== 起動タイミング ===== */
+
+if (document.readyState === "loading") {
+ document.addEventListener(
+  "DOMContentLoaded",
+  rpgInitialize,
+  { once: true }
+ );
+} else {
+ rpgInitialize();
+}
+
+/* ===== パート4ここまで ===== */
+</script>
+
 </body>
 </html>
