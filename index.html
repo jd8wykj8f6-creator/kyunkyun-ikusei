@@ -5139,5 +5139,1004 @@ if (document.readyState === "loading") {
 /* ===== パート4ここまで ===== */
 </script>
 
+<!-- ======================================
+ Season 3 パート5 / 8
+ バトルUI・ステージ別テーマ
+ 既存コードの下に追加
+====================================== -->
+
+<style>
+/* ===== RPG全体の見た目 ===== */
+
+#rpgScreen{
+ --rpg-accent:#ff87cb;
+ --rpg-accent2:#9c6dff;
+ --rpg-glow:#ff87cb55;
+ background:
+  radial-gradient(
+   ellipse at 50% 0%,
+   #49316c 0%,
+   transparent 65%
+  ),
+  linear-gradient(160deg,#111324,#211932);
+}
+
+/* ===== 戦闘画面 ===== */
+
+#rpgBattleArea .rpg-panel{
+ position:relative;
+ overflow:hidden;
+ padding:12px;
+ border:1px solid
+  var(--rpg-accent,#ff87cb);
+ background:
+  linear-gradient(
+   180deg,
+   #101323aa,
+   #131224f2
+  );
+ box-shadow:
+  0 0 24px var(--rpg-glow,#ff87cb44),
+  inset 0 0 20px #ffffff08;
+}
+
+/* ===== 戦闘フィールド ===== */
+
+#rpgBattleArea .rpg-enemy{
+ position:relative;
+ isolation:isolate;
+ min-height:245px;
+ padding:30px 12px 18px;
+ border-radius:18px;
+ overflow:hidden;
+ background:
+  radial-gradient(
+   ellipse at 50% 85%,
+   var(--rpg-accent2,#9c6dff) 0%,
+   transparent 48%
+  ),
+  radial-gradient(
+   circle at 50% 15%,
+   var(--rpg-glow,#ff87cb55),
+   transparent 58%
+  ),
+  linear-gradient(
+   180deg,
+   #17172c,
+   #30213d
+  );
+}
+
+/* ===== 魔法陣風の床 ===== */
+
+#rpgBattleArea .rpg-enemy::before{
+ content:"";
+ position:absolute;
+ width:230px;
+ height:80px;
+ border:2px solid
+  var(--rpg-accent,#ff87cb);
+ border-radius:50%;
+ left:50%;
+ bottom:20px;
+ transform:translateX(-50%);
+ box-shadow:
+  0 0 20px var(--rpg-glow,#ff87cb55),
+  inset 0 0 20px var(--rpg-glow,#ff87cb55);
+ opacity:.55;
+ z-index:-1;
+}
+
+/* ===== 敵の表示 ===== */
+
+#rpgEnemyIcon{
+ position:relative;
+ z-index:1;
+ font-size:90px;
+ line-height:1.35;
+ animation:rpgEnemyFloat 3s ease-in-out infinite;
+ filter:
+  drop-shadow(0 0 16px var(--rpg-accent));
+}
+
+@keyframes rpgEnemyFloat{
+ 0%,100%{transform:translateY(0)}
+ 50%{transform:translateY(-12px)}
+}
+
+#rpgEnemyName{
+ position:relative;
+ z-index:1;
+ font-size:19px;
+ text-shadow:0 2px 8px #000;
+}
+
+#rpgEnemyHPText{
+ position:relative;
+ z-index:1;
+ font-weight:bold;
+ color:#fff;
+ margin:7px 0;
+}
+
+/* ===== 敵HPバー ===== */
+
+#rpgBattleArea .rpg-enemy
+ .rpg-hp-track{
+ position:relative;
+ z-index:1;
+ height:13px;
+ border:1px solid #ffffff55;
+ box-shadow:0 0 10px #0008;
+}
+
+#rpgEnemyHPBar{
+ background:linear-gradient(
+  90deg,
+  #ff4d75,
+  #ffaece
+ ) !important;
+ box-shadow:0 0 12px #ff5b9a;
+ transition:width .4s ease;
+}
+
+/* ===== パーティーカード ===== */
+
+#rpgBattleParty{
+ margin:14px 0;
+ gap:7px;
+}
+
+#rpgBattleParty .rpg-member{
+ position:relative;
+ background:
+  linear-gradient(
+   145deg,
+   #28213d,
+   #17172c
+  );
+ border:1px solid #ffffff35;
+ border-radius:14px;
+ padding:8px 5px;
+ box-shadow:0 4px 12px #0005;
+ transition:
+  transform .2s,
+  box-shadow .2s;
+}
+
+#rpgBattleParty .rpg-member img{
+ height:110px;
+ object-fit:contain;
+ filter:drop-shadow(0 3px 8px #0009);
+}
+
+#rpgBattleParty
+ .rpg-member.rpg-selected{
+ border:2px solid
+  var(--rpg-accent,#ff87cb);
+ transform:translateY(-5px);
+ box-shadow:
+  0 0 18px var(--rpg-glow,#ff87cb55);
+}
+
+/* ===== HPゲージ ===== */
+
+#rpgBattleParty .rpg-hp-track{
+ height:10px;
+ border:1px solid #ffffff33;
+}
+
+#rpgBattleParty .rpg-hp-fill{
+ background:linear-gradient(
+  90deg,
+  #23b978,
+  #a4ffd4
+ );
+ box-shadow:0 0 8px #50ffad66;
+}
+
+/* ===== SP・絆ゲージ ===== */
+
+#rpgTurnInfo{
+ padding:11px;
+ text-align:center;
+ font-size:13px;
+ font-weight:bold;
+ border:1px solid #ffffff25;
+ border-radius:12px;
+ background:#0e1023;
+ color:#ffcee9;
+ letter-spacing:.4px;
+}
+
+/* ===== 戦闘ログ ===== */
+
+#rpgBattleLog{
+ background:#080c1be8;
+ border:1px solid #ffffff22;
+ border-left:3px solid
+  var(--rpg-accent,#ff87cb);
+ border-radius:12px;
+ padding:13px;
+ min-height:82px;
+ color:#f3eaff;
+}
+
+/* ===== コマンドボタン ===== */
+
+#rpgCommands{
+ margin-top:14px;
+ gap:9px;
+}
+
+#rpgCommands .rpg-button{
+ position:relative;
+ overflow:hidden;
+ min-height:52px;
+ border:1px solid #ffffff55;
+ border-radius:13px;
+ font-size:14px;
+ font-weight:900;
+ letter-spacing:.5px;
+ background:linear-gradient(
+  135deg,
+  var(--rpg-accent2,#9c6dff),
+  var(--rpg-accent,#ff87cb)
+ );
+ box-shadow:0 4px 12px #0006;
+}
+
+#rpgCommands .rpg-button:active{
+ transform:scale(.96);
+}
+
+#rpgCommands .rpg-button:disabled{
+ opacity:.35;
+ box-shadow:none;
+}
+
+/* ===== ステージ別テーマ ===== */
+
+#rpgScreen[data-rpg-stage="1"]{
+ --rpg-accent:#ff8bc7;
+ --rpg-accent2:#b88bff;
+ --rpg-glow:#ff7cbd66;
+}
+
+#rpgScreen[data-rpg-stage="2"]{
+ --rpg-accent:#bc9aff;
+ --rpg-accent2:#6b49d8;
+ --rpg-glow:#9875ff66;
+}
+
+#rpgScreen[data-rpg-stage="3"]{
+ --rpg-accent:#ff537a;
+ --rpg-accent2:#822045;
+ --rpg-glow:#e72b6266;
+}
+
+#rpgScreen[data-rpg-stage="4"]{
+ --rpg-accent:#5ee8ff;
+ --rpg-accent2:#3467c7;
+ --rpg-glow:#46dfff66;
+}
+
+#rpgScreen[data-rpg-stage="5"]{
+ --rpg-accent:#ffd36a;
+ --rpg-accent2:#a66b24;
+ --rpg-glow:#ffc34d77;
+}
+
+/* ===== ボス戦 ===== */
+
+#rpgScreen[data-rpg-stage="5"]
+ #rpgEnemyIcon{
+ font-size:110px;
+ animation:rpgBossFloat 2.2s ease-in-out infinite;
+}
+
+@keyframes rpgBossFloat{
+ 0%,100%{
+  transform:translateY(0) scale(1);
+ }
+ 50%{
+  transform:translateY(-10px) scale(1.08);
+ }
+}
+
+/* ===== スマホ調整 ===== */
+
+@media(max-width:380px){
+ #rpgBattleArea .rpg-enemy{
+  min-height:220px;
+ }
+ #rpgEnemyIcon{
+  font-size:76px;
+ }
+ #rpgBattleParty .rpg-member img{
+  height:85px;
+ }
+ #rpgCommands .rpg-button{
+  font-size:12px;
+  min-height:47px;
+ }
+}
+
+/* ===== 動きを減らす設定 ===== */
+
+@media(prefers-reduced-motion:reduce){
+ #rpgEnemyIcon{
+  animation:none !important;
+ }
+}
+</style>
+
+<script>
+/* ===== ステージテーマ連携 ===== */
+
+(function(){
+ "use strict";
+
+ // パート3の戦闘開始処理を保持
+ const originalStartBattle =
+  window.rpgStartBattle;
+
+ if (typeof originalStartBattle !== "function"){
+  console.warn(
+   "Season 3 パート3が見つかりません"
+  );
+  return;
+ }
+
+ // 戦闘開始時にテーマを切り替える
+ window.rpgStartBattle = function(stage){
+  const screen = document.getElementById(
+   "rpgScreen"
+  );
+
+  const stageNumber = Number(stage);
+
+  if(
+   screen &&
+   Number.isInteger(stageNumber) &&
+   stageNumber >= 1 &&
+   stageNumber <= 5
+  ){
+   screen.dataset.rpgStage =
+    String(stageNumber);
+  }
+
+  return originalStartBattle(stage);
+ };
+
+ // 初期状態はステージ1テーマ
+ const screen = document.getElementById(
+  "rpgScreen"
+ );
+
+ if(screen && !screen.dataset.rpgStage){
+  screen.dataset.rpgStage = "1";
+ }
+})();
+</script>
+
+<!-- Season 3 パート5ここまで -->
+
+<!-- ===== Season 3 パート6 / 8 ===== -->
+<style>
+#rpgBattleArea .rpg-enemy{
+ position:relative;
+}
+#rpgFxLayer{
+ position:absolute;
+ inset:0;
+ z-index:10;
+ pointer-events:none;
+ overflow:hidden;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+}
+.rpg-fx-text{
+ position:absolute;
+ font-size:38px;
+ font-weight:1000;
+ color:white;
+ text-shadow:0 3px 0 #65203d,0 0 18px #ff70b8;
+ animation:rpgNumberFly .95s ease-out forwards;
+}
+.rpg-fx-text.heal{
+ color:#7effc2;
+ text-shadow:0 0 15px #3dff9e;
+}
+.rpg-fx-symbol{
+ position:absolute;
+ font-size:85px;
+ filter:drop-shadow(0 0 18px currentColor);
+ animation:rpgSymbolPop .75s ease-out forwards;
+}
+.rpg-fx-symbol.momo{color:#ff426e}
+.rpg-fx-symbol.mei{color:#ff9ddd}
+.rpg-fx-symbol.rei{color:#69e9ff}
+.rpg-fx-symbol.attack{color:#ffe3ac}
+.rpg-hit{
+ animation:rpgEnemyHit .35s ease-in-out !important;
+}
+.rpg-battle-shake{
+ animation:rpgBattleShake .35s ease-in-out;
+}
+.rpg-healing{
+ animation:rpgHealGlow .85s ease-out;
+}
+@keyframes rpgNumberFly{
+ 0%{opacity:0;transform:translateY(25px) scale(.6)}
+ 25%{opacity:1;transform:translateY(0) scale(1.3)}
+ 100%{opacity:0;transform:translateY(-85px) scale(1)}
+}
+@keyframes rpgSymbolPop{
+ 0%{opacity:0;transform:scale(.3) rotate(-25deg)}
+ 45%{opacity:1;transform:scale(1.4) rotate(8deg)}
+ 100%{opacity:0;transform:scale(2) rotate(25deg)}
+}
+@keyframes rpgEnemyHit{
+ 0%,100%{transform:translateX(0)}
+ 20%{transform:translateX(-12px)}
+ 40%{transform:translateX(12px)}
+ 60%{transform:translateX(-8px)}
+ 80%{transform:translateX(8px)}
+}
+@keyframes rpgBattleShake{
+ 0%,100%{transform:translateX(0)}
+ 25%{transform:translateX(-5px)}
+ 75%{transform:translateX(5px)}
+}
+@keyframes rpgHealGlow{
+ 0%,100%{box-shadow:0 0 0 transparent}
+ 40%{box-shadow:0 0 26px #65ffb3}
+}
+@media(prefers-reduced-motion:reduce){
+ .rpg-fx-text,.rpg-fx-symbol,
+ .rpg-hit,.rpg-battle-shake,.rpg-healing{
+  animation:none!important;
+ }
+}
+</style>
+
+<script>
+(function(){
+ "use strict";
+
+ const oldCommand = window.rpgCommand;
+
+ if(typeof oldCommand !== "function") return;
+
+ function fxLayer(){
+  const arena = document.querySelector(
+   "#rpgBattleArea .rpg-enemy"
+  );
+  if(!arena) return null;
+
+  let layer = document.getElementById(
+   "rpgFxLayer"
+  );
+  if(!layer){
+   layer = document.createElement("div");
+   layer.id = "rpgFxLayer";
+   arena.appendChild(layer);
+  }
+  return layer;
+ }
+
+ function showFx(symbol,damage,type){
+  const layer = fxLayer();
+  if(!layer) return;
+
+  const icon = document.createElement("div");
+  icon.className = "rpg-fx-symbol " + type;
+  icon.textContent = symbol;
+  layer.appendChild(icon);
+
+  if(damage > 0){
+   const num = document.createElement("div");
+   num.className = "rpg-fx-text";
+   num.textContent = "-" + damage;
+   layer.appendChild(num);
+   setTimeout(()=>num.remove(),1000);
+  }
+
+  setTimeout(()=>icon.remove(),850);
+ }
+
+ window.rpgPlayAttackFx = showFx;
+
+ window.rpgCommand = function(command){
+  const before = window.rpgBattle;
+
+  // グローバルletのrpgBattleを参照
+  const battleBefore =
+   typeof rpgBattle !== "undefined"
+    ? rpgBattle : null;
+
+  if(!battleBefore || battleBefore.finished){
+   return oldCommand(command);
+  }
+
+  const actor = battleBefore.party[
+   battleBefore.actorIndex
+  ];
+
+  const enemyHP = battleBefore.enemy.hp;
+  const partyHP = battleBefore.party.map(
+   c=>c.hp
+  );
+  const logsBefore = battleBefore.logs.length;
+
+  const result = oldCommand(command);
+
+  const battleAfter =
+   typeof rpgBattle !== "undefined"
+    ? rpgBattle : null;
+
+  if(!battleAfter || battleAfter !== battleBefore){
+   return result;
+  }
+
+  // 行動が成立したときだけ演出
+  const newLogs = battleAfter.logs.slice(
+   logsBefore
+  ).join(" ");
+
+  const dealt = Math.max(
+   0,enemyHP-battleAfter.enemy.hp
+  );
+
+  if(dealt>0){
+   let symbol="⚔️";
+   let type="attack";
+
+   if(command==="skill" && actor?.id==="momo"){
+    symbol="🥀";type="momo";
+   }
+   if(command==="skill" && actor?.id==="rei"){
+    symbol="⚡";type="rei";
+   }
+   if(command==="bond"){
+    symbol="💖";type="momo";
+   }
+
+   showFx(symbol,dealt,type);
+
+   const enemy = document.getElementById(
+    "rpgEnemyIcon"
+   );
+   const arena = document.querySelector(
+    "#rpgBattleArea .rpg-enemy"
+   );
+
+   if(enemy){
+    enemy.classList.remove("rpg-hit");
+    void enemy.offsetWidth;
+    enemy.classList.add("rpg-hit");
+   }
+
+   if(arena){
+    arena.classList.remove("rpg-battle-shake");
+    void arena.offsetWidth;
+    arena.classList.add("rpg-battle-shake");
+   }
+  }
+
+  if(command==="skill" && actor?.id==="mei"
+     && newLogs.includes("ハートヒール")){
+   const cards = document.querySelectorAll(
+    "#rpgBattleParty .rpg-member"
+   );
+   battleAfter.party.forEach((c,i)=>{
+    if(c.hp>partyHP[i] && cards[i]){
+     cards[i].classList.add("rpg-healing");
+     setTimeout(
+      ()=>cards[i].classList.remove("rpg-healing"),
+      900
+     );
+    }
+   });
+   showFx("💚",0,"mei");
+  }
+
+  return result;
+ };
+})();
+</script>
+<!-- ===== パート6終了 ===== -->
+
+<!-- ===== Season 3 パート7 / 8 ===== -->
+<style>
+#rpgCutin{
+ position:fixed;
+ inset:0;
+ z-index:4100;
+ display:none;
+ align-items:center;
+ justify-content:center;
+ flex-direction:column;
+ overflow:hidden;
+ pointer-events:none;
+ background:
+  radial-gradient(circle,#e33c9c88,transparent 65%),
+  linear-gradient(135deg,#100b30,#47164d,#0b2855);
+}
+#rpgCutin.show{
+ display:flex;
+ animation:rpgCutinEnter 1.45s ease-out forwards;
+}
+.rpg-cutin-title{
+ font-size:clamp(27px,8vw,48px);
+ font-weight:1000;
+ text-align:center;
+ color:#fff;
+ text-shadow:
+  0 0 12px #ff62cb,
+  0 0 32px #a755ff;
+ animation:rpgCutinText .8s ease-out;
+}
+.rpg-cutin-party{
+ display:flex;
+ gap:8px;
+ width:95%;
+ max-width:500px;
+ justify-content:center;
+ margin:25px 0;
+}
+.rpg-cutin-character{
+ width:31%;
+ height:190px;
+ border:2px solid #ffffffbb;
+ border-radius:16px;
+ background:#ffffff16;
+ overflow:hidden;
+ transform:skew(-5deg);
+ box-shadow:0 0 20px #ff9bd777;
+}
+.rpg-cutin-character img{
+ width:100%;
+ height:100%;
+ object-fit:contain;
+}
+.rpg-cutin-character:nth-child(2){
+ transform:translateY(-15px);
+}
+.rpg-cutin-sub{
+ font-size:20px;
+ font-weight:bold;
+ color:#ffe49d;
+ text-shadow:0 0 12px #ff9d45;
+}
+@keyframes rpgCutinEnter{
+ 0%{opacity:0;filter:brightness(2)}
+ 12%{opacity:1;filter:brightness(1)}
+ 78%{opacity:1}
+ 100%{opacity:0}
+}
+@keyframes rpgCutinText{
+ from{transform:scale(2.5);opacity:0}
+ to{transform:scale(1);opacity:1}
+}
+
+/* ボス戦専用 */
+#rpgScreen[data-rpg-stage="5"]
+ #rpgBattleArea .rpg-enemy{
+ background:
+  radial-gradient(circle at 50% 55%,
+   #ffda7155,transparent 55%),
+  repeating-conic-gradient(
+   from 0deg at 50% 70%,
+   #ffc85016 0deg 20deg,
+   transparent 20deg 40deg
+  ),
+  linear-gradient(#160d2d,#53301d);
+ border:1px solid #ffd67a;
+ box-shadow:inset 0 0 40px #ffbb5033;
+}
+#rpgScreen[data-rpg-stage="5"]
+ #rpgEnemyName{
+ color:#ffe4a3;
+ letter-spacing:2px;
+ text-shadow:0 0 16px #ffb731;
+}
+@media(prefers-reduced-motion:reduce){
+ #rpgCutin.show,
+ .rpg-cutin-title{
+  animation:none!important;
+ }
+}
+</style>
+
+<div id="rpgCutin" aria-hidden="true">
+ <div class="rpg-cutin-title">
+  💖 キュン・トリニティ！
+ </div>
+ <div class="rpg-cutin-party">
+  <div class="rpg-cutin-character">
+   <img
+    src="./DC60C809-3450-44F0-AD54-6BFAE6ADF245.png"
+    alt="">
+  </div>
+  <div class="rpg-cutin-character">
+   <img
+    src="./無題146_20261023052427.png"
+    alt="">
+  </div>
+  <div class="rpg-cutin-character">
+   <img
+    src="./無題146_20261023052455.png"
+    alt="">
+  </div>
+ </div>
+ <div class="rpg-cutin-sub">
+  3人の絆が奇跡を起こす！
+ </div>
+</div>
+
+<script>
+(function(){
+ "use strict";
+
+ const previousCommand = window.rpgCommand;
+ if(typeof previousCommand!=="function") return;
+
+ window.rpgCommand = function(command){
+  const battle =
+   typeof rpgBattle!=="undefined"
+    ? rpgBattle:null;
+
+  const canCutin =
+   command==="bond" &&
+   battle &&
+   !battle.finished &&
+   battle.bond>=100 &&
+   battle.party[battle.actorIndex]?.hp>0;
+
+  const result = previousCommand(command);
+
+  if(canCutin){
+   const cutin = document.getElementById(
+    "rpgCutin"
+   );
+   if(cutin){
+    cutin.classList.remove("show");
+    void cutin.offsetWidth;
+    cutin.classList.add("show");
+    setTimeout(
+     ()=>cutin.classList.remove("show"),
+     1500
+    );
+   }
+  }
+
+  return result;
+ };
+})();
+</script>
+<!-- ===== パート7終了 ===== -->
+
+<!-- ===== Season 3 パート8 / 8 ===== -->
+<style>
+#rpgResultOverlay{
+ display:none;
+ position:fixed;
+ inset:0;
+ z-index:4200;
+ background:#08091ceF;
+ align-items:center;
+ justify-content:center;
+ padding:18px;
+ box-sizing:border-box;
+}
+#rpgResultOverlay.show{
+ display:flex;
+ animation:rpgResultAppear .4s ease-out;
+}
+.rpg-result-card{
+ width:100%;
+ max-width:430px;
+ padding:25px 18px;
+ border:2px solid #ffcf7b;
+ border-radius:22px;
+ background:
+  radial-gradient(circle at top,#653a89,#17152e 75%);
+ color:white;
+ text-align:center;
+ box-shadow:0 0 40px #b45aff66;
+}
+.rpg-result-title{
+ font-size:clamp(34px,10vw,55px);
+ font-weight:1000;
+ color:#ffe69a;
+ text-shadow:
+  0 0 12px #ffbc45,
+  0 0 28px #ff8d3b;
+}
+.rpg-result-title.lose{
+ color:#d3c7ec;
+ text-shadow:0 0 20px #6656b7;
+}
+.rpg-result-stars{
+ font-size:38px;
+ margin:12px 0;
+ animation:rpgStarBounce 1.2s ease-in-out infinite;
+}
+.rpg-result-reward{
+ padding:14px;
+ margin:16px 0;
+ border-radius:14px;
+ background:#ffffff14;
+ line-height:2;
+}
+.rpg-result-button{
+ width:100%;
+ border:0;
+ border-radius:13px;
+ padding:15px;
+ color:white;
+ font-size:16px;
+ font-weight:bold;
+ background:linear-gradient(135deg,#8b57fa,#ff66aa);
+}
+@keyframes rpgResultAppear{
+ from{opacity:0;transform:scale(.9)}
+ to{opacity:1;transform:scale(1)}
+}
+@keyframes rpgStarBounce{
+ 0%,100%{transform:scale(1)}
+ 50%{transform:scale(1.15)}
+}
+@media(prefers-reduced-motion:reduce){
+ #rpgResultOverlay.show,
+ .rpg-result-stars{
+  animation:none!important;
+ }
+}
+</style>
+
+<div id="rpgResultOverlay"
+ role="dialog"
+ aria-modal="true"
+ aria-label="バトル結果">
+ <div class="rpg-result-card">
+  <div id="rpgResultTitle"
+   class="rpg-result-title">
+   VICTORY!
+  </div>
+
+  <div id="rpgResultStars"
+   class="rpg-result-stars">
+   ⭐⭐⭐
+  </div>
+
+  <div id="rpgResultDetails"
+   class="rpg-result-reward">
+  </div>
+
+  <button
+   class="rpg-result-button"
+   type="button"
+   onclick="rpgResultReturn()">
+   🗺️ 冒険マップへ
+  </button>
+ </div>
+</div>
+
+<script>
+(function(){
+ "use strict";
+
+ const oldWin = window.rpgWinBattle;
+ const oldLose = window.rpgLoseBattle;
+
+ function showResult(won,battle){
+  const overlay = document.getElementById(
+   "rpgResultOverlay"
+  );
+  const title = document.getElementById(
+   "rpgResultTitle"
+  );
+  const stars = document.getElementById(
+   "rpgResultStars"
+  );
+  const details = document.getElementById(
+   "rpgResultDetails"
+  );
+
+  if(!overlay||!title||!stars||!details){
+   return;
+  }
+
+  title.textContent = won
+   ?"VICTORY!"
+   :"DEFEAT";
+
+  title.classList.toggle("lose",!won);
+
+  stars.textContent = won
+   ?"⭐ ⭐ ⭐"
+   :"💔";
+
+  if(won){
+   details.innerHTML =
+    "🎉 STAGE "+battle.stage+" CLEAR!<br>"+
+    "⭐ 経験値 +"+battle.enemy.exp+"<br>"+
+    "🪙 コイン報酬："+
+    battle.enemy.coins+"（未連携）<br>"+
+    "🏆 次の冒険が解放！";
+  }else{
+   details.innerHTML =
+    "💔 パーティーが全滅した……<br>"+
+    "もう一度挑戦しよう！";
+  }
+
+  overlay.classList.add("show");
+ }
+
+ if(typeof oldWin==="function"){
+  window.rpgWinBattle=function(){
+   const battle =
+    typeof rpgBattle!=="undefined"
+     ?rpgBattle:null;
+
+   const wasActive =
+    battle && !battle.finished;
+
+   const result=oldWin();
+
+   if(wasActive){
+    setTimeout(()=>{
+     if(rpgBattle===battle){
+      showResult(true,battle);
+     }
+    },1600);
+   }
+
+   return result;
+  };
+ }
+
+ if(typeof oldLose==="function"){
+  window.rpgLoseBattle=function(){
+   const battle =
+    typeof rpgBattle!=="undefined"
+     ?rpgBattle:null;
+
+   const wasActive =
+    battle && !battle.finished;
+
+   const result=oldLose();
+
+   if(wasActive){
+    setTimeout(()=>{
+     if(rpgBattle===battle){
+      showResult(false,battle);
+     }
+    },500);
+   }
+
+   return result;
+  };
+ }
+
+ window.rpgResultReturn=function(){
+  const overlay=document.getElementById(
+   "rpgResultOverlay"
+  );
+  if(overlay){
+   overlay.classList.remove("show");
+  }
+  if(typeof rpgRetreat==="function"){
+   rpgRetreat();
+  }
+ };
+})();
+</script>
+<!-- ===== パート8終了 ===== -->
+
 </body>
 </html>
