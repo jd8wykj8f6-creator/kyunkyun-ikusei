@@ -6066,7 +6066,7 @@ if (document.readyState === "loading") {
     "🎉 STAGE "+battle.stage+" CLEAR!<br>"+
     "⭐ 経験値 +"+battle.enemy.exp+"<br>"+
     "🪙 コイン報酬："+
-    battle.enemy.coins+"（未連携）<br>"+
+    battle.enemy.coins+" 獲得！<br>"+
     "🏆 次の冒険が解放！";
   }else{
    details.innerHTML =
@@ -6137,6 +6137,94 @@ if (document.readyState === "loading") {
 })();
 </script>
 <!-- ===== パート8終了 ===== -->
+
+<!-- ===== Season 3: 画像アセット連携 + コイン報酬 ===== -->
+<style>
+#rpgBattleArea .rpg-enemy{position:relative;isolation:isolate;overflow:hidden;min-height:270px;background-size:cover!important;background-position:center!important}
+#rpgScreen[data-rpg-stage="1"] #rpgBattleArea .rpg-enemy{background-image:linear-gradient(#130b29a0,#130b29bd),url('./背景1.PNG')!important}
+#rpgScreen[data-rpg-stage="2"] #rpgBattleArea .rpg-enemy{background-image:linear-gradient(#130b29a0,#130b29bd),url('./背景2.PNG')!important}
+#rpgScreen[data-rpg-stage="3"] #rpgBattleArea .rpg-enemy{background-image:linear-gradient(#130b29a0,#130b29bd),url('./背景3.PNG')!important}
+#rpgScreen[data-rpg-stage="4"] #rpgBattleArea .rpg-enemy{background-image:linear-gradient(#130b29a0,#130b29bd),url('./背景4.PNG')!important}
+#rpgScreen[data-rpg-stage="5"] #rpgBattleArea .rpg-enemy{background-image:linear-gradient(#130b29a0,#130b29bd),url('./背景5.PNG')!important}
+#rpgEnemyIcon.rpg-asset-enemy{font-size:0!important;width:min(70%,230px)!important;height:170px!important;margin:8px auto!important;display:flex!important;align-items:center;justify-content:center;filter:drop-shadow(0 8px 12px #130420)}
+#rpgEnemyIcon.rpg-asset-enemy img{width:100%;height:100%;object-fit:contain}
+#rpgBattleArea .rpg-enemy h3,#rpgEnemyHPText{position:relative;z-index:2;text-shadow:0 2px 6px #000}
+#rpgCommands .rpg-button{background-size:cover;background-position:center;background-blend-mode:soft-light;min-height:54px;text-shadow:0 2px 5px #31072f}
+#rpgCommands .rpg-button:nth-child(1){background-image:linear-gradient(#7d246599,#7d246599),url('./攻撃.PNG')}
+#rpgCommands .rpg-button:nth-child(2){background-image:linear-gradient(#7d246599,#7d246599),url('./スキル.PNG')}
+#rpgCommands .rpg-button:nth-child(3){background-image:linear-gradient(#7d246599,#7d246599),url('./防御.PNG')}
+#rpgCommands .rpg-button:nth-child(4){background-image:linear-gradient(#7d246599,#7d246599),url('./連携必殺技.PNG')}
+#rpgAssetEffect{position:absolute;z-index:10;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0}
+#rpgAssetEffect img{width:min(85%,320px);max-height:240px;object-fit:contain;filter:drop-shadow(0 0 16px #ff9ddd)}
+#rpgAssetEffect.play{animation:rpgAssetFlash .72s ease-out both}
+@keyframes rpgAssetFlash{0%{opacity:0;transform:scale(.6)}20%{opacity:1;transform:scale(1.05)}65%{opacity:1}100%{opacity:0;transform:scale(1.3)}}
+#rpgBattleArea .rpg-hp-fill{transition:width .3s ease}
+</style>
+<script>
+(function(){
+ 'use strict';
+ const enemyFiles={slime:'スライム.PNG',bat:'バット.PNG',wolf:'ウルフ.PNG',spirit:'精霊.PNG',boss:'キングスライム.PNG'};
+ const rewarded=new WeakSet();
+ const render=window.rpgRenderBattle;
+ if(typeof render==='function'){
+  window.rpgRenderBattle=function(){
+   const result=render.apply(this,arguments);
+   const b=typeof rpgBattle!=='undefined'?rpgBattle:null;
+   const el=document.getElementById('rpgEnemyIcon');
+   if(b&&el){
+    const file=enemyFiles[b.enemy.id];
+    if(file){
+     el.classList.add('rpg-asset-enemy');
+     el.textContent='';
+     const img=document.createElement('img');
+     img.src='./'+file;
+     img.alt=b.enemy.name;
+     img.onerror=()=>{el.classList.remove('rpg-asset-enemy');el.textContent=b.enemy.icon};
+     el.appendChild(img);
+    }
+   }
+   return result;
+  };
+ }
+ function flash(file){
+  const enemy=document.querySelector('#rpgBattleArea .rpg-enemy');
+  if(!enemy||!file)return;
+  let layer=document.getElementById('rpgAssetEffect');
+  if(!layer){layer=document.createElement('div');layer.id='rpgAssetEffect';enemy.appendChild(layer)}
+  layer.classList.remove('play');layer.replaceChildren();
+  const img=document.createElement('img');img.src='./'+file;img.alt='技のエフェクト';
+  img.onerror=()=>{layer.classList.remove('play')};
+  layer.appendChild(img);void layer.offsetWidth;layer.classList.add('play');
+ }
+ const command=window.rpgCommand;
+ if(typeof command==='function'){
+  window.rpgCommand=function(action){
+   const b=typeof rpgBattle!=='undefined'?rpgBattle:null;
+   const actor=b&&!b.finished&&typeof rpgCurrentActor==='function'?rpgCurrentActor():null;
+   if(actor&&((action==='skill'&&b.sp>=15)||(action==='bond'&&b.bond>=100)||action==='attack'||action==='guard')){
+    const file=action==='bond'?'連携必殺技.PNG':action==='guard'?'防御.PNG':action==='attack'?'薔薇の回転斬撃.PNG':actor.id==='mei'?'ハートヒール.PNG':actor.id==='rei'?'プラズマショット.PNG':'黒薔薇の斬撃.PNG';
+    flash(file);
+   }
+   return command.apply(this,arguments);
+  };
+ }
+ const win=window.rpgWinBattle;
+ if(typeof win==='function'){
+  window.rpgWinBattle=function(){
+   const b=typeof rpgBattle!=='undefined'?rpgBattle:null;
+   const eligible=b&&!b.finished&&!rewarded.has(b);
+   const result=win.apply(this,arguments);
+   if(eligible&&b.finished){
+    rewarded.add(b);
+    if(typeof addCoins==='function')addCoins(b.enemy.coins||0);
+    if(typeof rpgAddLog==='function')rpgAddLog('🪙 コイン +'+(b.enemy.coins||0)+' 獲得！');
+   }
+   return result;
+  };
+ }
+})();
+</script>
+<!-- ===== 画像連携ここまで ===== -->
 
 </body>
 </html>
